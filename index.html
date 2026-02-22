@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NearBuzz — Neon Edition</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#05030e;--s1:#0b0819;--s2:#110e22;--s3:#17132d;--s4:#1f1a38;
+  --bd:rgba(139,92,246,.09);--bd2:rgba(139,92,246,.16);--bd3:rgba(139,92,246,.26);
+  --gold:#8b5cf6;--gold2:#a78bfa;--gold3:#ddd6fe;
+  --ac:#6d28d9;--ac2:#8b5cf6;
+  --gr:#10b981;--bl:#06b6d4;--pu:#e879f9;
+  --tx:#ede9fe;--mu:#3b3460;--mu2:#7c72a8;--mu3:#b8b0d4;
+}
+body{background:#030110;min-height:100vh;display:flex;align-items:center;justify-content:center;gap:56px;font-family:-apple-system,system-ui,sans-serif;color:var(--tx);padding:40px 20px}
+
+/* SIDEBAR */
+.sidebar{width:260px;flex-shrink:0}
+.s-logo{font-size:30px;font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,#e9d5ff,#a78bfa,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.s-sub{font-size:13px;color:var(--mu2);line-height:1.65;margin-top:7px}
+.s-feats{margin-top:20px;display:flex;flex-direction:column;gap:8px}
+.sf{display:flex;gap:10px;padding:11px;background:rgba(109,40,217,.04);border:1px solid rgba(139,92,246,.1);border-radius:12px;align-items:flex-start}
+.sf-i{font-size:18px;flex-shrink:0}
+.sf-n{font-size:12px;font-weight:600;margin-bottom:2px;color:var(--gold3);background:linear-gradient(135deg,#ddd6fe,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sf-d{font-size:11px;color:var(--mu2);line-height:1.5}
+.s-btn{margin-top:20px;width:100%;padding:13px;background:linear-gradient(135deg,#6d28d9,#8b5cf6,#a78bfa);border:none;border-radius:12px;color:#fff;font-size:13px;font-weight:800;cursor:pointer;letter-spacing:.3px}
+.s-note{margin-top:8px;font-size:11px;color:var(--mu);text-align:center}
+
+/* PHONE */
+.phone{width:375px;height:812px;background:var(--bg);border-radius:46px;border:1.5px solid rgba(139,92,246,.2);overflow:hidden;position:relative;box-shadow:0 0 0 8px #0a0a0d,0 40px 100px rgba(0,0,0,.95),0 0 60px rgba(201,168,76,.04);flex-shrink:0}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:116px;height:30px;background:#030305;border-radius:0 0 18px 18px;z-index:99;display:flex;align-items:center;justify-content:center;gap:6px}
+.ns{width:44px;height:4px;background:#111;border-radius:2px}.nc{width:10px;height:10px;background:#111;border-radius:50%}
+
+/* SCREENS */
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;opacity:0;pointer-events:none;background:var(--bg)}
+.scr.active{opacity:1;pointer-events:all}
+.scr.ei{animation:ei .3s cubic-bezier(.22,1,.36,1) both}
+.scr.eo{animation:eo .22s ease both}
+@keyframes ei{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+@keyframes eo{from{opacity:1}to{opacity:0;transform:translateX(-14px)}}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes dt{0%,80%,100%{transform:scale(0)}40%{transform:scale(1)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pg{from{width:0}to{width:100%}}
+@keyframes sh{0%,100%{box-shadow:0 0 24px rgba(109,40,217,.5),0 0 48px rgba(139,92,246,.2)}50%{box-shadow:0 0 40px rgba(139,92,246,.9),0 0 80px rgba(167,139,250,.4)}}
+
+/* STATUSBAR */
+.sb{display:flex;justify-content:space-between;padding:10px 18px 0;font-size:11px;font-weight:600;flex-shrink:0;color:var(--mu3)}
+
+/* TOPBAR */
+.tb{padding:4px 16px 8px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.logo{font-size:20px;font-weight:900;letter-spacing:-.5px;background:linear-gradient(135deg,#e9d5ff,#a78bfa,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.tbr{display:flex;gap:6px}
+.ib{width:32px;height:32px;background:var(--s1);border:1px solid var(--bd);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;position:relative;flex-shrink:0}
+.ib:active{background:var(--s2);transform:scale(.9)}
+.dbg{position:absolute;top:4px;right:4px;width:6px;height:6px;background:var(--gold);border-radius:50%;border:1.5px solid var(--bg)}
+.ph{padding:4px 16px 10px;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.bk{width:32px;height:32px;background:var(--s1);border:1px solid var(--bd);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;flex-shrink:0;color:var(--mu3)}
+.bk:active{background:var(--s2)}
+.pt{font-size:15px;font-weight:700;flex:1}
+
+/* WALLET CHIP */
+.wchip{margin:0 16px 10px;padding:10px 13px;background:linear-gradient(135deg,rgba(109,40,217,.1),rgba(139,92,246,.04));border:1px solid rgba(139,92,246,.2);border-radius:13px;display:flex;align-items:center;gap:9px;cursor:pointer;flex-shrink:0}
+.wchip:active{border-color:rgba(201,168,76,.35)}
+.wbal{font-size:16px;font-weight:800;color:var(--gold2);flex:1;background:linear-gradient(135deg,#c4b5fd,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.wlbl{font-size:10px;color:var(--mu2)}
+.wadd{font-size:11px;color:var(--gold2);background:rgba(139,92,246,.12);padding:4px 9px;border-radius:7px;font-weight:600;flex-shrink:0;cursor:pointer}
+
+/* LOC BAR */
+.lb{margin:0 16px 10px;padding:8px 12px;background:var(--s1);border:1px solid var(--bd);border-radius:12px;display:flex;align-items:center;gap:8px;cursor:pointer;flex-shrink:0}
+.ld{width:6px;height:6px;border-radius:50%;background:var(--gr);box-shadow:0 0 6px var(--gr);flex-shrink:0;animation:bl 2s ease infinite}
+.li{flex:1}.ln{font-size:12px;font-weight:500}.ls{font-size:10px;color:var(--mu2);margin-top:1px}
+.lr{font-size:10px;color:var(--gold);background:rgba(139,92,246,.08);padding:3px 7px;border-radius:6px;font-weight:600;flex-shrink:0}
+
+/* TABS */
+.tabs{display:flex;gap:5px;padding:0 16px 10px;overflow-x:auto;flex-shrink:0}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:5px 11px;border-radius:16px;font-size:11px;font-weight:500;white-space:nowrap;cursor:pointer;border:1px solid var(--bd);background:var(--s1);color:var(--mu2);flex-shrink:0;transition:all .18s}
+.tab.on{background:linear-gradient(135deg,#6d28d9,#8b5cf6,#a78bfa);color:#fff;border-color:transparent;font-weight:700}
+
+/* SCROLL */
+.sc{flex:1;overflow-y:auto;padding:0 16px 88px}
+.sc::-webkit-scrollbar{display:none}
+.sec{font-size:9px;font-weight:700;color:var(--mu);letter-spacing:1.5px;text-transform:uppercase;margin:3px 0 9px;display:flex;align-items:center;gap:7px}
+.sec::after{content:"";flex:1;height:1px;background:var(--bd)}
+.sec span{color:var(--gold);background:rgba(201,168,76,.1);padding:1px 6px;border-radius:4px;letter-spacing:.5px;font-size:9px}
+
+/* STORIES */
+.sts{display:flex;gap:9px;margin-bottom:14px;overflow-x:auto}
+.sts::-webkit-scrollbar{display:none}
+.si{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;flex-shrink:0}
+.sr{width:46px;height:46px;border-radius:14px;padding:1.5px;background:linear-gradient(135deg,#4c1d95,#7c3aed,#a855f7,#e879f9)}
+.sr.s{background:var(--s3)}
+.sin{width:100%;height:100%;border-radius:12px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:18px;border:2px solid var(--bg)}
+.slb{font-size:9px;color:var(--mu2);max-width:48px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* CARD */
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:16px;margin-bottom:9px;overflow:hidden;cursor:pointer;animation:fu .3s ease both;transition:border-color .2s}
+.card:active{transform:scale(.984)}
+.card.hot{border-color:rgba(139,92,246,.3)}
+.ct{padding:11px 11px 0;display:flex;align-items:center;gap:8px}
+.av{width:34px;height:34px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
+.ai{flex:1;min-width:0}.an{font-size:12px;font-weight:600}.ap{font-size:10px;color:var(--mu2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.at{font-size:10px;color:var(--mu);flex-shrink:0}
+.cb{padding:7px 11px 0}.ctxt{font-size:12px;line-height:1.58;color:rgba(240,240,245,.85)}
+.ctags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.ctag{font-size:10px;color:var(--gold2);background:rgba(139,92,246,.08);padding:2px 6px;border-radius:5px}
+.cm{margin:7px 11px 0;border-radius:10px;background:var(--s2);display:flex;align-items:center;justify-content:center;position:relative}
+.cph{display:flex;flex-direction:column;align-items:center;gap:5px;padding:24px;color:var(--mu)}
+.cph em{font-size:28px;font-style:normal}.cph p{font-size:10px}
+.cmb{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.65);border-radius:6px;padding:2px 7px;font-size:10px;color:#fff;font-weight:500}
+.rws{margin:7px 11px 0;background:linear-gradient(135deg,rgba(109,40,217,.08),rgba(139,92,246,.03));border:1px solid rgba(139,92,246,.15);border-radius:9px;padding:8px 10px;display:flex;align-items:center;gap:8px}
+.rwi{font-size:16px;flex-shrink:0}.rwt{flex:1}.rwtt{font-size:11px;font-weight:600;color:var(--pu)}.rws2{font-size:10px;color:var(--mu2);margin-top:1px}
+.rwn{font-size:11px;font-weight:800;color:var(--gold2)}
+.prog{height:2.5px;background:var(--s3);border-radius:2px;margin-top:4px;overflow:hidden}
+.pb{height:100%;border-radius:2px;background:linear-gradient(90deg,#6d28d9,#8b5cf6,#a78bfa)}
+.cf{padding:7px 11px 10px;display:flex;border-top:1px solid var(--bd);margin-top:8px}
+.act{display:flex;align-items:center;justify-content:center;gap:4px;font-size:11px;color:var(--mu2);cursor:pointer;padding:4px;border-radius:7px;border:none;background:none;flex:1;transition:color .15s}
+.act:active{background:var(--s2)}.act.liked{color:var(--pu)}
+.aic{font-size:14px}
+
+/* BUTTONS */
+.bp{width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#6d28d9,#8b5cf6,#a78bfa);border:none;color:#fff;font-size:13px;font-weight:800;cursor:pointer;letter-spacing:.2px}
+.bp:active{transform:scale(.97)}
+.bp2{width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,var(--ac),var(--ac2));border:none;color:#fff;font-size:13px;font-weight:800;cursor:pointer}
+.bp2:active{transform:scale(.97)}
+.bg{padding:11px;border-radius:11px;border:1px solid var(--bd2);background:transparent;color:var(--mu2);font-size:12px;cursor:pointer;transition:background .15s}
+.bg:active{background:var(--s2)}
+
+/* BOTTOM NAV */
+.bnav{position:absolute;bottom:0;left:0;right:0;background:rgba(7,7,9,.97);backdrop-filter:blur(20px);border-top:1px solid rgba(139,92,246,.12);padding:7px 10px 22px;display:flex;justify-content:space-around;align-items:center;z-index:50}
+.ni{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:3px 10px;border-radius:9px}
+.ni:active{background:var(--s1)}.nic{font-size:19px;color:var(--mu)}.nlb{font-size:9px;color:var(--mu);font-weight:500}
+.ni.on .nic{filter:none}.ni.on .nlb{color:var(--gold2)}
+.ni.on .nic{font-size:19px}
+.fab{width:42px;height:42px;margin-top:-5px;background:linear-gradient(135deg,#6d28d9,#8b5cf6,#a78bfa);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;box-shadow:0 4px 16px rgba(201,168,76,.35);flex-shrink:0;animation:sh 3s ease infinite}
+.fab:active{transform:scale(.9)}
+
+/* FORM */
+.flbl{font-size:10px;font-weight:700;color:var(--mu2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.fw{position:relative}
+.fld{width:100%;background:var(--s1);border:1.5px solid var(--bd);border-radius:11px;padding:11px 12px 11px 38px;color:var(--tx);font-size:13px;outline:none;margin-bottom:11px;font-family:inherit;transition:border-color .2s}
+.fld:focus{border-color:rgba(201,168,76,.35)}
+.fld::placeholder{color:var(--mu)}
+.fi{position:absolute;left:11px;top:50%;transform:translateY(-58%);font-size:15px}
+.dv{display:flex;align-items:center;gap:8px;margin:13px 0;color:var(--mu);font-size:11px}
+.dv::before,.dv::after{content:"";flex:1;height:1px;background:var(--bd)}
+.socb{width:100%;padding:11px;border-radius:11px;border:1.5px solid var(--bd2);background:var(--s1);color:var(--tx);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;transition:background .15s}
+.socb:active{background:var(--s2)}
+.sw{text-align:center;margin-top:11px;font-size:12px;color:var(--mu2)}.sw a{color:var(--gold2);cursor:pointer;font-weight:500}
+.ta{width:100%;background:var(--s1);border:1.5px solid var(--bd);border-radius:11px;padding:10px 12px;color:var(--tx);font-size:12px;resize:none;outline:none;margin-bottom:5px;min-height:72px;font-family:inherit;transition:border-color .2s}
+.ta:focus{border-color:rgba(201,168,76,.3)}.ta::placeholder{color:var(--mu)}
+.stars{display:flex;gap:4px;margin-bottom:11px}
+.star{font-size:22px;cursor:pointer;opacity:.18;transition:all .15s}.star.on{opacity:1}
+.mor{display:flex;gap:6px;margin-bottom:11px}
+.mo{flex:1;background:var(--s1);border:1.5px solid var(--bd);border-radius:10px;padding:10px 4px;text-align:center;cursor:pointer;transition:all .15s}
+.mo:active,.mo.on{border-color:var(--gold);background:rgba(201,168,76,.06)}
+.utype{display:flex;gap:7px;margin-bottom:13px}
+.ut{flex:1;padding:12px 6px;border-radius:11px;border:1.5px solid var(--bd);background:var(--s1);cursor:pointer;text-align:center;transition:all .2s}
+.ut.on{border-color:var(--gold);background:rgba(139,92,246,.08)}
+
+/* MODAL */
+.modal{position:absolute;inset:0;background:rgba(0,0,0,.78);backdrop-filter:blur(10px);z-index:200;display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal.on{opacity:1;pointer-events:all}
+.msh{background:var(--s1);border-radius:20px 20px 0 0;border-top:1px solid rgba(201,168,76,.12);padding:14px 16px 34px;width:100%;transform:translateY(100%);transition:transform .34s cubic-bezier(.22,1,.36,1)}
+.modal.on .msh{transform:none}
+.mh{width:30px;height:3px;background:var(--s3);border-radius:2px;margin:0 auto 13px}
+.mt{font-size:16px;font-weight:700;margin-bottom:10px}
+.plo{display:flex;align-items:center;gap:9px;padding:9px;border-radius:10px;cursor:pointer;margin-bottom:2px;transition:background .15s}
+.plo:active{background:var(--s2)}
+.ploi{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+
+/* TOAST */
+.toast{position:absolute;top:48px;left:16px;right:16px;z-index:300;background:var(--s2);border:1px solid rgba(201,168,76,.2);color:var(--tx);border-radius:11px;padding:10px 13px;font-size:12px;font-weight:600;pointer-events:none;opacity:0;transform:translateY(-6px);transition:all .26s cubic-bezier(.22,1,.36,1);box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.toast.on{opacity:1;transform:none}
+.toast.ok{background:rgba(31,216,122,.15);border-color:rgba(31,216,122,.3);color:var(--gr)}
+.toast.err{background:rgba(255,77,38,.12);border-color:rgba(255,77,38,.2);color:var(--ac2)}
+.toast.gold{background:rgba(109,40,217,.15);border-color:rgba(139,92,246,.3);color:var(--gold2)}
+
+/* WALLET SCREEN */
+.w-hero{margin:0 16px 14px;border-radius:16px;background:linear-gradient(135deg,#0d0720,#180e38,#0d0720);border:1px solid rgba(139,92,246,.2);padding:20px;position:relative;overflow:hidden}
+.w-hero::before{content:"";position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:radial-gradient(circle,rgba(139,92,246,.2),transparent 70%)}
+.w-hero::after{content:"";position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;background:radial-gradient(circle,rgba(109,40,217,.12),transparent 70%)}
+.w-lbl{font-size:10px;color:rgba(201,168,76,.6);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
+.w-amt{font-size:36px;font-weight:900;background:linear-gradient(135deg,#c4b5fd,#a78bfa,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-1px}
+.w-sub{font-size:11px;color:rgba(201,168,76,.5);margin-top:3px}
+.w-acts{display:flex;gap:8px;margin-top:14px}
+.wa{flex:1;padding:9px;border-radius:10px;border:none;font-size:11px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+.wa:active{transform:scale(.95)}
+.wa-ic{font-size:18px}
+.wa1{background:linear-gradient(135deg,#6d28d9,#8b5cf6);color:#fff}
+.wa2{background:var(--s2);border:1px solid var(--bd2);color:var(--mu3)}
+.wa3{background:var(--s2);border:1px solid var(--bd2);color:var(--mu3)}
+
+/* CARD METHODS */
+.card-m{background:var(--s1);border:1px solid var(--bd);border-radius:13px;padding:13px;margin-bottom:8px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:border-color .2s}
+.card-m:active{border-color:var(--gold)}
+.card-m.sel{border-color:rgba(139,92,246,.4);background:rgba(109,40,217,.06)}
+.cm-ic{width:42px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0}
+.cm-n{font-size:13px;font-weight:600;flex:1}
+.cm-s{font-size:11px;color:var(--mu2)}
+.cm-chk{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--bd2);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.cm-chk.on{background:linear-gradient(135deg,#6d28d9,#8b5cf6);border-color:transparent;color:#fff;font-size:11px}
+
+/* ADD CARD FORM */
+.card-input{width:100%;background:var(--s1);border:1.5px solid var(--bd);border-radius:11px;padding:11px 13px;color:var(--tx);font-size:14px;outline:none;margin-bottom:9px;font-family:inherit;letter-spacing:.5px;transition:border-color .2s}
+.card-input:focus{border-color:rgba(201,168,76,.35)}
+.card-input::placeholder{color:var(--mu);letter-spacing:0}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* PERSON CARD */
+.pc{background:var(--s1);border:1px solid var(--bd);border-radius:16px;margin-bottom:9px;overflow:hidden;animation:fu .3s ease both;transition:border-color .2s}
+.pc:hover{border-color:rgba(201,168,76,.1)}
+.ptop{padding:12px 12px 0;display:flex;align-items:center;gap:10px}
+.pav{width:46px;height:46px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0;position:relative}
+.pon{position:absolute;bottom:-1px;right:-1px;width:12px;height:12px;border-radius:50%;border:2px solid var(--s1)}
+.pbody{padding:7px 12px 0}
+.pfoot{padding:7px 12px 11px;display:flex;gap:6px}
+.pbtn{flex:1;padding:9px;border-radius:10px;border:none;color:#fff;font-size:11px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,#6d28d9,#8b5cf6,#a78bfa)}
+.pbtn:active{transform:scale(.97)}
+.pmsg{width:36px;height:36px;border-radius:10px;background:var(--s2);border:1px solid var(--bd);font-size:15px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.pmsg:active{background:var(--s3)}
+
+/* TREAT GRID */
+.tg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.ti{background:var(--s1);border:1.5px solid var(--bd);border-radius:12px;padding:13px 7px;text-align:center;cursor:pointer;transition:all .18s}
+.ti:active,.ti.on{border-color:var(--gold);background:rgba(201,168,76,.07)}
+
+/* PAY CONFIRM */
+.pay-box{background:linear-gradient(135deg,rgba(109,40,217,.08),rgba(139,92,246,.03));border:1px solid rgba(139,92,246,.18);border-radius:14px;padding:16px;margin-bottom:13px}
+.pay-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.pay-row:last-child{margin-bottom:0;padding-top:6px;border-top:1px solid rgba(201,168,76,.1)}
+.pay-lbl{font-size:11px;color:var(--mu2)}
+.pay-val{font-size:12px;font-weight:600}
+.pay-total{font-size:14px;font-weight:800;background:linear-gradient(135deg,#c4b5fd,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+/* LOADING */
+.spin{width:18px;height:18px;border:2px solid rgba(201,168,76,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;margin-right:6px}
+
+/* REWARDS */
+.mys{background:linear-gradient(135deg,rgba(109,40,217,.1),rgba(139,92,246,.04));border:1px solid rgba(139,92,246,.15);border-radius:16px;padding:16px;margin-bottom:16px}
+.str{display:flex;gap:12px;margin-bottom:11px}
+.sv{font-size:22px;font-weight:800}.sk{font-size:10px;color:var(--mu2);margin-top:1px}
+.rnk{display:inline-flex;align-items:center;gap:4px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);border-radius:8px;padding:4px 10px;font-size:10px;color:var(--gold2);font-weight:600}
+.rwc{background:var(--s1);border:1px solid var(--bd);border-radius:13px;padding:11px;margin-bottom:7px;display:flex;align-items:center;gap:9px}
+.rwic{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.rwst{font-size:10px;font-weight:700;padding:5px 9px;border-radius:7px;flex-shrink:0;cursor:pointer;border:none}
+.srd{background:rgba(31,216,122,.1);color:var(--gr)}.spg{background:rgba(139,92,246,.12);color:var(--gold2)}
+
+/* KPI */
+.kpig{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}
+.kc{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:12px}
+.kv{font-size:20px;font-weight:800}.kl{font-size:10px;color:var(--mu2);margin-top:1px}.kch{font-size:10px;margin-top:3px;font-weight:600;color:var(--gr)}
+.brow{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.brl{font-size:9px;color:var(--mu2);width:22px;text-align:right;flex-shrink:0}
+.brt{flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden}
+.brf{height:100%;border-radius:3px;background:linear-gradient(90deg,#6d28d9,#8b5cf6)}
+
+/* NOTIF */
+.nii{display:flex;gap:9px;padding:11px 0;border-bottom:1px solid var(--bd);align-items:flex-start}
+.niiav{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.niitx{flex:1;font-size:11px;line-height:1.55}.niitx b{font-weight:600}
+.niitm{font-size:10px;color:var(--mu);margin-top:2px}.niid{width:6px;height:6px;border-radius:50%;background:var(--pu);margin-top:4px;flex-shrink:0}
+
+/* MAP */
+.mfk{flex:1;background:#080810;position:relative;overflow:hidden}
+.mpn{position:absolute;display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.mpb{border-radius:9px;padding:4px 8px;font-size:10px;font-weight:700;color:#fff;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.6)}
+.mpb:active{transform:scale(.93)}
+.mpt{width:2px;height:7px;margin:0 auto}
+.myu{position:absolute;width:13px;height:13px;background:#fff;border-radius:50%;box-shadow:0 0 0 5px rgba(255,255,255,.18),0 0 14px rgba(255,255,255,.4)}
+.mrg{position:absolute;border-radius:50%;border:1px dashed rgba(139,92,246,.25);background:rgba(109,40,217,.02)}
+.mov{position:absolute;bottom:76px;left:16px;right:16px;background:rgba(8,8,16,.96);backdrop-filter:blur(12px);border:1px solid rgba(139,92,246,.15);border-radius:14px;padding:11px;display:flex;gap:9px;align-items:center}
+
+/* SPLASH */
+#splash{justify-content:center;align-items:center}
+.spic{width:76px;height:76px;background:linear-gradient(135deg,#4c1d95,#6d28d9,#8b5cf6);border-radius:22px;display:flex;align-items:center;justify-content:center;font-size:34px;margin-bottom:12px;box-shadow:0 12px 40px rgba(109,40,217,.5),inset 0 1px 0 rgba(255,255,255,.15),0 0 60px rgba(139,92,246,.3)}
+.sptt{font-size:34px;font-weight:900;letter-spacing:-1.5px;margin-bottom:5px;background:linear-gradient(135deg,#e9d5ff,#a78bfa,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.spsu{font-size:12px;color:var(--mu2)}
+.spld{display:flex;gap:5px;margin-top:48px}
+.spld i{width:5px;height:5px;background:var(--gold2);border-radius:50%;animation:dt 1.4s ease infinite;font-style:normal}
+.spld i:nth-child(2){animation-delay:.16s}.spld i:nth-child(3){animation-delay:.32s}
+
+/* ONBOARD */
+#ob{background:var(--bg)}
+.obsl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;opacity:0;transform:translateX(32px);transition:all .4s cubic-bezier(.22,1,.36,1)}
+.obsl.on{opacity:1;transform:none}.obsl.prev{opacity:0;transform:translateX(-32px)}
+.obds{display:flex;gap:4px;justify-content:center;padding:14px}
+.odd{width:5px;height:5px;border-radius:3px;background:var(--s3);transition:all .28s}
+.odd.on{width:16px;background:linear-gradient(90deg,#6d28d9,#a78bfa)}
+.obft{padding:11px 18px 32px;display:flex;gap:7px}
+
+/* CAMP HINT */
+.camp-h{background:linear-gradient(135deg,rgba(109,40,217,.08),rgba(139,92,246,.03));border:1px solid rgba(139,92,246,.18);border-radius:10px;padding:9px 11px;display:flex;align-items:center;gap:7px;margin-bottom:12px;cursor:pointer}
+
+@media(max-width:700px){.sidebar{display:none}body{gap:0;padding:0}}
+</style>
+
+
+/* AVATARS */
+.ava{border-radius:50%;object-fit:cover;flex-shrink:0}
+.av-wrap{position:relative;flex-shrink:0}
+.av-wrap .pon{position:absolute;bottom:0;right:0;width:11px;height:11px;border-radius:50%;border:2px solid var(--s1)}
+.av-img{border-radius:16px;width:46px;height:46px;object-fit:cover;flex-shrink:0}
+.av-img-sm{border-radius:11px;width:34px;height:34px;object-fit:cover;flex-shrink:0}
+/* GROUP COUPON */
+.gc-card{background:var(--s1);border:1px solid rgba(139,92,246,.2);border-radius:16px;margin-bottom:10px;overflow:hidden;animation:fu .3s ease both}
+.gc-hero{background:linear-gradient(135deg,#1a0d35,#2d1555);padding:14px;display:flex;align-items:center;gap:11px}
+.gc-ic{font-size:28px;flex-shrink:0}
+.gc-info{flex:1}
+.gc-title{font-size:13px;font-weight:700;color:var(--gold3)}
+.gc-sub{font-size:10px;color:var(--mu2);margin-top:2px}
+.gc-badge{font-size:10px;font-weight:700;padding:4px 9px;border-radius:7px;background:rgba(139,92,246,.2);color:var(--gold2);flex-shrink:0}
+.gc-body{padding:11px}
+.gc-slots{display:flex;align-items:center;gap:6px;margin-bottom:9px}
+.gc-av-row{display:flex;gap:-4px}
+.gc-av{width:24px;height:24px;border-radius:50%;border:2px solid var(--s1);margin-left:-6px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.gc-av:first-child{margin-left:0}
+.gc-slot-txt{font-size:11px;color:var(--mu2)}
+.gc-prog{height:4px;background:var(--s3);border-radius:2px;overflow:hidden;margin-bottom:9px}
+.gc-pb{height:100%;background:linear-gradient(90deg,#6d28d9,#a78bfa);border-radius:2px;transition:width .5s ease}
+.gc-footer{display:flex;gap:7px}
+.gc-join{flex:1;padding:9px;border-radius:10px;background:linear-gradient(135deg,#6d28d9,#8b5cf6);border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer}
+.gc-join:active{transform:scale(.96)}
+.gc-timer{font-size:10px;color:var(--pu);font-weight:600;display:flex;align-items:center;gap:3px}
+/* BIZ REVIEW MANAGEMENT */
+.rev-card{background:var(--s1);border:1px solid var(--bd);border-radius:14px;margin-bottom:9px;overflow:hidden}
+.rev-head{padding:11px;display:flex;align-items:flex-start;gap:9px}
+.rev-av{width:38px;height:38px;border-radius:12px;object-fit:cover;flex-shrink:0}
+.rev-body{padding:0 11px 11px}
+.rev-txt{font-size:12px;line-height:1.6;color:rgba(240,236,255,.85)}
+.rev-acts{display:flex;gap:6px;padding:0 11px 11px}
+.rev-btn{padding:7px 12px;border-radius:9px;border:none;font-size:11px;font-weight:700;cursor:pointer}
+.rev-btn:active{transform:scale(.96)}
+.rb-reward{background:linear-gradient(135deg,#6d28d9,#8b5cf6);color:#fff}
+.rb-reply{background:var(--s2);border:1px solid var(--bd2);color:var(--mu3)}
+.rb-resolve{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);color:var(--gr)}
+.rev-reply-box{background:var(--s2);padding:10px 11px;border-top:1px solid var(--bd);display:none}
+.rev-reply-box.on{display:block}
+.rev-stars{display:flex;gap:2px;margin-top:2px}
+.rev-star{font-size:12px}
+.neg-badge{font-size:10px;font-weight:600;padding:3px 7px;border-radius:6px;background:rgba(239,68,68,.1);color:#f87171;flex-shrink:0}
+.pos-badge{font-size:10px;font-weight:600;padding:3px 7px;border-radius:6px;background:rgba(139,92,246,.1);color:var(--gold2);flex-shrink:0}
+<style>
+/* NEON EXTRAS */
+.logo,.s-logo{text-shadow:0 0 20px rgba(139,92,246,.4)}
+.fab{box-shadow:0 4px 20px rgba(109,40,217,.6),0 0 40px rgba(139,92,246,.3)!important}
+.bp{box-shadow:0 4px 16px rgba(109,40,217,.4)}
+.bp:active{box-shadow:none}
+.phone::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 80% 30% at 50% 0%,rgba(109,40,217,.06),transparent),radial-gradient(ellipse 60% 20% at 50% 100%,rgba(139,92,246,.04),transparent);pointer-events:none;z-index:500}
+.wchip:active{box-shadow:0 0 20px rgba(139,92,246,.2)}
+.tab.on{box-shadow:0 2px 12px rgba(109,40,217,.4)}
+.si .sr:not(.s){box-shadow:0 4px 14px rgba(109,40,217,.3)}
+.card.hot::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse 60% 30% at 50% -10%,rgba(139,92,246,.04),transparent);pointer-events:none}
+.bnav{background:rgba(5,3,14,.97)!important}
+body{background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(76,29,149,.08),transparent),#030110!important}
+.spic{animation:gw 2.5s ease infinite,neonpulse 2s ease infinite}
+@keyframes neonpulse{0%,100%{text-shadow:0 0 10px rgba(139,92,246,.5)}50%{text-shadow:0 0 30px rgba(167,139,250,.9)}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="s-logo">NearBuzz</div>
+  <div class="s-sub">Etrafındaki deneyimleri keşfet. Yakınındaki insanlarla tanış, anlık indirimleri ve kampanyaları kaçırma.</div>
+  <div class="s-feats">
+    <div class="sf"><div class="sf-i">📍</div><div><div class="sf-n">Konum Bazlı Feed</div><div class="sf-d">500m çevrendeki anlık deneyimler önüne gelir.</div></div></div>
+    <div class="sf"><div class="sf-i">🎁</div><div><div class="sf-n">Ödül Sistemi</div><div class="sf-d">Beğeni aldıkça işletmelerden gerçek ödüller.</div></div></div>
+    <div class="sf"><div class="sf-i">💳</div><div><div class="sf-n">Entegre Ödeme</div><div class="sf-d">Bakiye yükle, yakınına kahve bira yemek ısmarla.</div></div></div>
+    <div class="sf"><div class="sf-i">🏢</div><div><div class="sf-n">İşletme Paneli</div><div class="sf-d">Kampanya oluştur, içerikleri yönet, ödülleri dağıt.</div></div></div>
+  </div>
+  <button class="s-btn">📱 Demo'yu Dene →</button>
+  <div class="s-note">← Sağdaki telefona tıklayarak keşfet</div>
+</div>
+
+<!-- PHONE -->
+<div class="phone">
+  <div class="notch"><div class="ns"></div><div class="nc"></div></div>
+  <div class="toast" id="T"></div>
+
+  <!-- PLACE MODAL -->
+  <div class="modal" id="PM" onclick="if(event.target===this)closePM()">
+    <div class="msh">
+      <div class="mh"></div>
+      <div class="mt">📍 Yakındaki Mekânlar</div>
+      <div class="plo" onclick="pickP('Zara','Cevahir 1.kat','🏬','zara')"><div class="ploi" style="background:rgba(201,168,76,.1)">🏬</div><div style="flex:1"><div style="font-size:13px;font-weight:500">Zara</div><div style="font-size:10px;color:var(--mu2)">Giyim • 1.kat</div></div><div style="font-size:10px;color:var(--gr);font-weight:600">90m</div></div>
+      <div class="plo" onclick="pickP('Shake Shack','3.kat','🍔','shake')"><div class="ploi" style="background:rgba(61,142,255,.1)">🍔</div><div style="flex:1"><div style="font-size:13px;font-weight:500">Shake Shack</div><div style="font-size:10px;color:var(--mu2)">Fast Food • 3.kat</div></div><div style="font-size:10px;color:var(--gr);font-weight:600">140m</div></div>
+      <div class="plo" onclick="pickP('Starbucks','Zemin','☕','none')"><div class="ploi" style="background:rgba(31,216,122,.1)">☕</div><div style="flex:1"><div style="font-size:13px;font-weight:500">Starbucks</div><div style="font-size:10px;color:var(--mu2)">Kafe • Zemin kat</div></div><div style="font-size:10px;color:var(--gr);font-weight:600">200m</div></div>
+      <div class="plo" onclick="pickP('H&amp;M','2.kat','👗','hm')"><div class="ploi" style="background:rgba(155,109,255,.1)">👗</div><div style="flex:1"><div style="font-size:13px;font-weight:500">H&amp;M</div><div style="font-size:10px;color:var(--mu2)">Giyim • 2.kat</div></div><div style="font-size:10px;color:var(--gr);font-weight:600">210m</div></div>
+      <div class="plo" onclick="pickP('Sushi Co.','3.kat','🍱','none')"><div class="ploi" style="background:rgba(255,210,38,.1)">🍱</div><div style="flex:1"><div style="font-size:13px;font-weight:500">Sushi Co.</div><div style="font-size:10px;color:var(--mu2)">Restoran • 3.kat</div></div><div style="font-size:10px;color:var(--gr);font-weight:600">350m</div></div>
+    </div>
+  </div>
+
+  <!-- SPLASH -->
+  <div class="scr active" id="splash">
+    <div class="spic">📍</div>
+    <div class="sptt">NearBuzz</div>
+    <div class="spsu">Etrafındaki deneyimleri keşfet</div>
+    <div class="spld"><i></i><i></i><i></i></div>
+  </div>
+
+  <!-- ONBOARD -->
+  <div class="scr" id="ob">
+    <div style="flex:1;position:relative;overflow:hidden">
+      <div class="obsl on"><div style="font-size:68px;margin-bottom:18px">📍</div><div style="font-size:22px;font-weight:800;text-align:center;margin-bottom:9px">Konumun Rehberin</div><div style="font-size:13px;line-height:1.7;color:var(--mu2);text-align:center">Bir mekâna yaklaştığında orada yaşanan anlık deneyimler önüne gelir.</div></div>
+      <div class="obsl"><div style="font-size:68px;margin-bottom:18px">💳</div><div style="font-size:22px;font-weight:800;text-align:center;margin-bottom:9px">Güvenli Ödeme</div><div style="font-size:13px;line-height:1.7;color:var(--mu2);text-align:center">Bakiye yükle, yakınındaki insanlara anında ısmarlama yap. Güvenli, hızlı, şeffaf.</div></div>
+      <div class="obsl"><div style="font-size:68px;margin-bottom:18px">🥂</div><div style="font-size:22px;font-weight:800;text-align:center;margin-bottom:9px">Tanış & Issmarla</div><div style="font-size:13px;line-height:1.7;color:var(--mu2);text-align:center">Yakınındaki insanlara kahve, yemek veya bira ısmarla. Yeni bağlantılar kur!</div></div>
+    </div>
+    <div class="obds"><div class="odd on"></div><div class="odd"></div><div class="odd"></div></div>
+    <div class="obft">
+      <button class="bg" style="flex:1" onclick="nav('login')">Geç</button>
+      <button class="bp" id="obn" onclick="obNext()" style="flex:2">Devam →</button>
+    </div>
+  </div>
+
+  <!-- LOGIN -->
+  <div class="scr" id="login">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('ob')">←</div></div>
+    <div class="sc" style="padding-bottom:28px">
+      <div style="font-size:22px;font-weight:800;margin-bottom:4px">Hoş geldin 👋</div>
+      <div style="color:var(--mu2);font-size:12px;margin-bottom:20px">NearBuzz hesabına giriş yap</div>
+      <div class="flbl">Telefon veya E-posta</div>
+      <div class="fw"><span class="fi">📱</span><input class="fld" type="text" placeholder="+90 555 000 00 00"></div>
+      <div class="flbl">Şifre</div>
+      <div class="fw"><span class="fi">🔒</span><input class="fld" type="password" placeholder="••••••••"></div>
+      <button class="bp" onclick="doLogin()">Giriş Yap</button>
+      <div class="dv">veya</div>
+      <div class="socb" onclick="doLogin()"><span>🌐</span>Google ile Giriş</div>
+      <div class="socb" onclick="doLogin()"><span>📘</span>Facebook ile Giriş</div>
+      <div class="socb" onclick="doLogin()" style="background:rgba(0,0,0,.3);border-color:var(--bd3)"><span>🍎</span>Apple ile Giriş</div>
+      <div class="sw">Hesabın yok mu? <a onclick="nav('register')">Kayıt Ol</a></div>
+      <div class="sw" style="margin-top:6px"><a onclick="nav('biz')" style="color:var(--bl)">İşletme girişi →</a></div>
+    </div>
+  </div>
+
+  <!-- REGISTER -->
+  <div class="scr" id="register">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('login')">←</div><div class="pt">Kayıt Ol ✨</div></div>
+    <div class="sc" style="padding-bottom:28px">
+      <div class="flbl">Hesap Türü</div>
+      <div class="utype">
+        <div class="ut on" onclick="selType(this)"><div style="font-size:19px;margin-bottom:3px">🙋</div><div style="font-size:11px;font-weight:600">Bireysel</div><div style="font-size:9px;color:var(--mu)">Ücretsiz</div></div>
+        <div class="ut" onclick="selType(this);setTimeout(()=>nav('biz'),400)"><div style="font-size:19px;margin-bottom:3px">🏢</div><div style="font-size:11px;font-weight:600">İşletme</div><div style="font-size:9px;color:var(--mu)">Panel dahil</div></div>
+      </div>
+      <div class="flbl">Ad Soyad</div>
+      <div class="fw"><span class="fi">👤</span><input class="fld" type="text" placeholder="Adın ve soyadın"></div>
+      <div class="flbl">Telefon</div>
+      <div class="fw"><span class="fi">📱</span><input class="fld" type="tel" placeholder="+90 555 000 00 00"></div>
+      <div class="flbl">Şifre</div>
+      <div class="fw"><span class="fi">🔒</span><input class="fld" type="password" placeholder="En az 8 karakter"></div>
+      <button class="bp" onclick="doReg()">Kayıt Ol →</button>
+      <div class="sw">Hesabın var mı? <a onclick="nav('login')">Giriş Yap</a></div>
+    </div>
+  </div>
+
+  <!-- FEED -->
+  <div class="scr" id="feed">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="tb">
+      <div class="logo">NearBuzz</div>
+      <div class="tbr">
+        <div class="ib" onclick="nav('wallet')" style="border-color:rgba(201,168,76,.2)">💳</div>
+        <div class="ib" onclick="nav('notifs')">🔔<div class="dbg"></div></div>
+        <div class="ib" onclick="nav('profile')">👤</div>
+      </div>
+    </div>
+    <div class="wchip" onclick="nav('wallet')">
+      <div>
+        <div class="wlbl">Bakiyen</div>
+        <div class="wbal" id="feed-bal">₺247.50</div>
+      </div>
+      <div style="flex:1"></div>
+      <div class="wadd" onclick="event.stopPropagation();nav('add-funds')">+ Yükle</div>
+    </div>
+    <div class="lb" onclick="toast2('📍 Konum güncelleniyor...')"><div class="ld"></div><div class="li"><div class="ln">Cevahir AVM Çevresi</div><div class="ls">Şişli, İstanbul • Canlı takip</div></div><div class="lr">500m</div></div>
+    <div class="tabs"><div class="tab on" onclick="swT(this)">Tümü</div><div class="tab" onclick="swT(this)">🍽 Yemek</div><div class="tab" onclick="swT(this)">🛍 Alışveriş</div><div class="tab" onclick="swT(this)">☕ Kafe</div><div class="tab" onclick="swT(this)">🎉 Eğlence</div></div>
+    <div class="sc">
+      <div class="sec">Hikayeler</div>
+      <div class="sts">
+        <div class="si" onclick="toast2('🏬 Zara hikayeleri')"><div class="sr"><div class="sin">🏬</div></div><div class="slb">Zara</div></div>
+        <div class="si" onclick="toast2('🍔 Shake Shack')"><div class="sr"><div class="sin">🍔</div></div><div class="slb">ShakeShack</div></div>
+        <div class="si" onclick="toast2('☕ Starbucks')"><div class="sr"><div class="sin">☕</div></div><div class="slb">Starbucks</div></div>
+        <div class="si"><div class="sr s"><div class="sin">👗</div></div><div class="slb">H&amp;M</div></div>
+        <div class="si"><div class="sr s"><div class="sin">🍱</div></div><div class="slb">Sushi Co.</div></div>
+      </div>
+      <div class="sec">Şu An Yakında <span>5 paylaşım</span></div>
+      <div class="card hot" onclick="nav('detail')">
+        <div class="ct"><div class="av" style="background:linear-gradient(135deg,#ff4d26,#ff7a45)">M</div><div class="ai"><div class="an">Merve A. <span style="font-size:9px;color:var(--gold)">★ VIP</span></div><div class="ap">📍 Zara • 90m uzakta</div></div><div class="at">4dk</div></div>
+        <div class="cb"><div class="ctxt">Zara'da yazlık elbiseler %40 indirime girdi! Stoklar tükeniyor 🔥</div><div class="ctags"><span class="ctag">#indirim</span><span class="ctag">#yazmodası</span></div></div>
+        <div class="cm" style="height:126px"><div class="cph"><em>👗</em><p>Fotoğraf • Yazlık koleksiyon</p></div><div class="cmb">📷 3</div></div>
+        <div class="rws"><div class="rwi">🎁</div><div class="rwt"><div class="rwtt">Zara Kampanyası</div><div class="rws2">50 beğeni = %10 indirim kodu</div><div class="prog"><div class="pb" style="width:76%"></div></div></div><div class="rwn">38/50</div></div>
+        <div class="cf">
+          <button class="act" onclick="event.stopPropagation();doLike(this,38)"><span class="aic">🤍</span><span>38</span></button>
+          <button class="act" onclick="event.stopPropagation()"><span class="aic">💬</span><span>12</span></button>
+          <button class="act" onclick="event.stopPropagation()"><span class="aic">↗️</span><span>Paylaş</span></button>
+          <button class="act" onclick="event.stopPropagation()"><span class="aic">🔖</span></button>
+        </div>
+      </div>
+      <div class="card" style="animation-delay:.07s">
+        <div class="ct"><div class="av" style="background:linear-gradient(135deg,#3d8eff,#7b5fe8)">K</div><div class="ai"><div class="an">Kerem B.</div><div class="ap">📍 Shake Shack • 140m</div></div><div class="at">18dk</div></div>
+        <div class="cb"><div class="ctxt">Shake Shack'ta bugün sıra YOK! Smash burger serisi başlamış 😍</div><div class="ctags"><span class="ctag">#burger</span><span class="ctag">#sırayok</span></div></div>
+        <div class="cm" style="height:116px"><div class="cph"><em>🎬</em><p>Video • 0:28</p></div><div class="cmb">▶ Video</div></div>
+        <div class="rws"><div class="rwi">🍟</div><div class="rwt"><div class="rwtt">Shake Shack Kampanyası</div><div class="rws2">50 beğeni = Bedava patates</div><div class="prog"><div class="pb" style="width:62%"></div></div></div><div class="rwn">31/50</div></div>
+        <div class="cf">
+          <button class="act" onclick="doLike(this,61)"><span class="aic">🤍</span><span>61</span></button>
+          <button class="act"><span class="aic">💬</span><span>9</span></button>
+          <button class="act"><span class="aic">↗️</span><span>Paylaş</span></button>
+          <button class="act"><span class="aic">🔖</span></button>
+          <button class="act" onclick="openReport('post','Kerem B. paylaşımı')"><span class="aic">🚩</span></button>
+        </div>
+      </div>
+      <div class="card" style="animation-delay:.13s">
+        <div class="ct"><div class="av" style="background:linear-gradient(135deg,#1fd87a,#0fa85a)">S</div><div class="ai"><div class="an">Selin Y.</div><div class="ap">📍 Starbucks • 200m</div></div><div class="at">32dk</div></div>
+        <div class="cb"><div class="ctxt">Starbucks'ta kuyruk yok! Yeni mango soğuk kahve gelmiş ☕🥭</div></div>
+        <div class="cf"><button class="act" onclick="doLike(this,24)"><span class="aic">🤍</span><span>24</span></button><button class="act"><span class="aic">💬</span><span>5</span></button><button class="act"><span class="aic">↗️</span><span>Paylaş</span></button></div>
+      </div>
+    </div>
+    <div class="bnav">
+      <div class="ni on"><div class="nic">🏠</div><div class="nlb">Feed</div></div>
+      <div class="ni" onclick="nav('map')"><div class="nic">🗺️</div><div class="nlb">Harita</div></div>
+      <div class="fab" onclick="nav('share')">✦</div>
+      <div class="ni" onclick="nav('meet')"><div class="nic">🥂</div><div class="nlb">Tanış</div></div>
+      <div class="ni" onclick="nav('rewards')"><div class="nic">🎁</div><div class="nlb">Ödüller</div></div>
+    </div>
+  </div>
+
+  <!-- WALLET -->
+  <div class="scr" id="wallet">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('feed')">←</div><div class="pt">Cüzdanım 💳</div></div>
+    <div class="sc" style="padding-bottom:28px">
+      <div class="w-hero">
+        <div class="w-lbl">TOPLAM BAKİYE</div>
+        <div class="w-amt">₺247,50</div>
+        <div class="w-sub">Son işlem: Starbucks kahve • 2sa önce</div>
+        <div class="w-acts">
+          <div class="wa wa1" onclick="nav('add-funds')"><span class="wa-ic">+</span><span>Yükle</span></div>
+          <div class="wa wa2" onclick="toast2('↑ Transfer yakında...')"><span class="wa-ic">↑</span><span>Gönder</span></div>
+          <div class="wa wa3" onclick="nav('txns')"><span class="wa-ic">≡</span><span>Geçmiş</span></div>
+        </div>
+      </div>
+
+      <div class="sec">Ödeme Yöntemlerim</div>
+      <div class="card-m sel" onclick="selCard(this)">
+        <div class="cm-ic" style="background:#1a3a6b;font-size:11px;font-weight:800;color:#fff">VISA</div>
+        <div style="flex:1"><div class="cm-n">•••• •••• •••• 4242</div><div class="cm-s">Son kullanma: 08/27</div></div>
+        <div class="cm-chk on">✓</div>
+      </div>
+      <div class="card-m" onclick="selCard(this)">
+        <div class="cm-ic" style="background:#c41e3a;font-size:9px;font-weight:800;color:#fff">MC</div>
+        <div style="flex:1"><div class="cm-n">•••• •••• •••• 8891</div><div class="cm-s">Son kullanma: 03/26</div></div>
+        <div class="cm-chk"></div>
+      </div>
+      <div class="card-m" onclick="selCard(this)">
+        <div class="cm-ic" style="background:#000;font-size:13px">🍎</div>
+        <div style="flex:1"><div class="cm-n">Apple Pay</div><div class="cm-s">Face ID ile ödeme</div></div>
+        <div class="cm-chk"></div>
+      </div>
+      <div class="card-m" onclick="selCard(this)">
+        <div class="cm-ic" style="background:#fff;font-size:13px">G</div>
+        <div style="flex:1"><div class="cm-n">Google Pay</div><div class="cm-s">Kayıtlı kart ile</div></div>
+        <div class="cm-chk"></div>
+      </div>
+
+      <button class="bp" style="margin-bottom:8px" onclick="nav('add-card')">+ Yeni Kart Ekle</button>
+
+      <div class="sec" style="margin-top:8px">Son İşlemler</div>
+      <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:10px;padding:11px;border-bottom:1px solid var(--bd)">
+          <div style="width:34px;height:34px;border-radius:10px;background:rgba(255,77,38,.1);display:flex;align-items:center;justify-content:center;font-size:16px">☕</div>
+          <div style="flex:1"><div style="font-size:12px;font-weight:500">Ece T. için Kahve</div><div style="font-size:10px;color:var(--mu2);margin-top:1px">Starbucks • 2 saat önce</div></div>
+          <div style="font-size:12px;font-weight:700;color:var(--ac)">-₺49</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:11px;border-bottom:1px solid var(--bd)">
+          <div style="width:34px;height:34px;border-radius:10px;background:rgba(31,216,122,.1);display:flex;align-items:center;justify-content:center;font-size:16px">💳</div>
+          <div style="flex:1"><div style="font-size:12px;font-weight:500">Bakiye Yükleme</div><div style="font-size:10px;color:var(--mu2);margin-top:1px">VISA •4242 • Dün</div></div>
+          <div style="font-size:12px;font-weight:700;color:var(--gr)">+₺200</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:11px;border-bottom:1px solid var(--bd)">
+          <div style="width:34px;height:34px;border-radius:10px;background:rgba(155,109,255,.1);display:flex;align-items:center;justify-content:center;font-size:16px">🍺</div>
+          <div style="flex:1"><div style="font-size:12px;font-weight:500">Burak Y. için Bira</div><div style="font-size:10px;color:var(--mu2);margin-top:1px">Bar Luna • 3 gün önce</div></div>
+          <div style="font-size:12px;font-weight:700;color:var(--ac)">-₺75</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:11px">
+          <div style="width:34px;height:34px;border-radius:10px;background:rgba(201,168,76,.1);display:flex;align-items:center;justify-content:center;font-size:16px">🎁</div>
+          <div style="flex:1"><div style="font-size:12px;font-weight:500">Zara Ödül İadesi</div><div style="font-size:10px;color:var(--mu2);margin-top:1px">Kampanya • 5 gün önce</div></div>
+          <div style="font-size:12px;font-weight:700;color:var(--gr)">+₺47</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD FUNDS -->
+  <div class="scr" id="add-funds">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('wallet')">←</div><div class="pt">Bakiye Yükle</div></div>
+    <div class="sc" style="padding-bottom:28px">
+      <div class="flbl">Tutar Seç</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:13px" id="amts">
+        <div class="ti" onclick="selAmt(this,50)"><div style="font-size:13px;font-weight:700;color:var(--gold2)">₺50</div></div>
+        <div class="ti" onclick="selAmt(this,100)"><div style="font-size:13px;font-weight:700;color:var(--gold2)">₺100</div></div>
+        <div class="ti on" onclick="selAmt(this,200)"><div style="font-size:13px;font-weight:700;color:var(--gold2)">₺200</div></div>
+        <div class="ti" onclick="selAmt(this,500)"><div style="font-size:13px;font-weight:700;color:var(--gold2)">₺500</div></div>
+        <div class="ti" onclick="selAmt(this,1000)"><div style="font-size:13px;font-weight:700;color:var(--gold2)">₺1.000</div></div>
+        <div class="ti" onclick="selAmt(this,0)"><div style="font-size:12px;color:var(--mu2)">Diğer</div></div>
+      </div>
+      <div class="flbl">Ödeme Yöntemi</div>
+      <div class="card-m sel" id="pay-sel" onclick="toast2('💳 Kart seçimi')">
+        <div class="cm-ic" style="background:#1a3a6b;font-size:11px;font-weight:800;color:#fff">VISA</div>
+        <div style="flex:1"><div class="cm-n">•••• 4242</div><div class="cm-s">Varsayılan kart</div></div>
+        <div style="font-size:11px;color:var(--gold);font-weight:600">Değiştir</div>
+      </div>
+      <div class="pay-box">
+        <div class="pay-row"><span class="pay-lbl">Yüklenecek tutar</span><span class="pay-val" id="pamt">₺200,00</span></div>
+        <div class="pay-row"><span class="pay-lbl">İşlem ücreti</span><span class="pay-val">₺0,00</span></div>
+        <div class="pay-row"><span class="pay-lbl">Yeni bakiye</span><span class="pay-total">₺447,50</span></div>
+      </div>
+      <button class="bp" id="load-btn" onclick="doLoad()">₺200 Yükle →</button>
+      <div style="text-align:center;font-size:10px;color:var(--mu);margin-top:9px">🔒 256-bit SSL şifreleme • Stripe / iyzico güvencesi</div>
+    </div>
+  </div>
+
+  <!-- ADD CARD -->
+  <div class="scr" id="add-card">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('wallet')">←</div><div class="pt">Kart Ekle 💳</div></div>
+    <div class="sc" style="padding-bottom:28px">
+      <div style="background:linear-gradient(135deg,#1a1505,#2a2008);border:1px solid rgba(201,168,76,.2);border-radius:14px;padding:18px;margin-bottom:16px;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-20px;right:-20px;width:80px;height:80px;background:radial-gradient(circle,rgba(201,168,76,.15),transparent 70%)"></div>
+        <div style="font-size:10px;color:rgba(201,168,76,.5);font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px">KART NUMARASI</div>
+        <div style="font-size:17px;font-weight:700;letter-spacing:3px;color:var(--gold2);margin-bottom:12px" id="card-preview">•••• •••• •••• ••••</div>
+        <div style="display:flex;justify-content:space-between">
+          <div><div style="font-size:9px;color:rgba(201,168,76,.4);text-transform:uppercase">Son Kullanma</div><div style="font-size:12px;color:var(--gold3);margin-top:2px" id="exp-preview">MM/YY</div></div>
+          <div><div style="font-size:9px;color:rgba(201,168,76,.4);text-transform:uppercase">CVV</div><div style="font-size:12px;color:var(--gold3);margin-top:2px">•••</div></div>
+          <div style="width:40px;height:25px;background:linear-gradient(135deg,#c41e3a,#a01530);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff">MC</div>
+        </div>
+      </div>
+      <div class="flbl">Kart Numarası</div>
+      <input class="card-input" type="tel" placeholder="0000 0000 0000 0000" maxlength="19" oninput="fmtCard(this)" id="cnum">
+      <div class="row2" style="gap:8px;margin-bottom:9px">
+        <div>
+          <div class="flbl">Son Kullanma</div>
+          <input class="card-input" type="tel" placeholder="MM/YY" maxlength="5" oninput="fmtExp(this)" id="cexp">
+        </div>
+        <div>
+          <div class="flbl">CVV</div>
+          <input class="card-input" type="tel" placeholder="•••" maxlength="3" id="ccvv">
+        </div>
+      </div>
+      <div class="flbl">Kart Üzerindeki İsim</div>
+      <input class="card-input" type="text" placeholder="AD SOYAD" style="text-transform:uppercase">
+      <div style="display:flex;align-items:center;gap:8px;padding:11px;background:rgba(31,216,122,.05);border:1px solid rgba(31,216,122,.12);border-radius:10px;margin-bottom:13px">
+        <span style="font-size:15px">🔒</span>
+        <div style="font-size:11px;color:var(--mu2);line-height:1.5">Kart bilgilerin <b style="color:var(--gr)">iyzico</b> tarafından güvenle saklanır. NearBuzz kart numaranı görmez.</div>
+      </div>
+      <button class="bp" onclick="doAddCard()">Kartı Kaydet →</button>
+    </div>
+  </div>
+
+  <!-- MEET -->
+  <div class="scr" id="meet">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="tb">
+      <div>
+        <div class="logo">Tanış <span style="font-size:12px;color:var(--mu2);font-weight:400;background:unset;-webkit-text-fill-color:var(--mu2)">& Issmarla</span></div>
+        <div style="font-size:10px;color:var(--mu2);margin-top:1px">Bakiyen: <span style="color:var(--gold2);font-weight:600">₺247,50</span> • 8 kişi aktif</div>
+      </div>
+    </div>
+    <div class="tabs"><div class="tab on" onclick="swT(this)">Hepsi</div><div class="tab" onclick="swT(this)">☕ Kahve</div><div class="tab" onclick="swT(this)">🍺 Bira</div><div class="tab" onclick="swT(this)">🍽 Yemek</div><div class="tab" onclick="swT(this)">💬 Sohbet</div></div>
+    <div class="sc">
+      <div class="sec">Şu An Yakında <span>4 kişi</span></div>
+      <div class="pc">
+        <div class="ptop"><div class="av-wrap"><div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#ff4d6d,#c9184a);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;position:relative;flex-shrink:0">E<div class="pon" style="background:var(--gr)"></div></div></div><div style="flex:1"><div style="font-size:13px;font-weight:600">Ece T. <span style="font-size:10px;background:rgba(139,92,246,.1);color:var(--gold2);padding:2px 6px;border-radius:5px">☕ Sever</span></div><div style="font-size:10px;color:var(--mu2);margin-top:1px">📍 Starbucks • 200m</div></div><div style="font-size:10px;color:var(--gr);background:rgba(31,216,122,.08);padding:3px 7px;border-radius:6px;font-weight:600">● Orada</div></div>
+        <div class="pbody"><div style="font-size:12px;color:rgba(240,240,245,.82);line-height:1.58">Çalışırken kahve eşliği arıyorum ☕ Remote çalışma, teknoloji...</div><div class="ctags" style="margin-top:5px"><span class="ctag">💻 Remote</span><span class="ctag">📚 Kitap</span></div></div>
+        <div class="pfoot"><button class="pbtn" onclick="openSend('Ece T.','☕','Starbucks',49)">☕ Kahve Issmarla • ₺49</button><div class="pmsg" onclick="toast2('💬 Mesaj gönderildi!')">💬</div></div>
+      </div>
+      <div class="pc" style="animation-delay:.07s">
+        <div class="ptop"><div class="av-wrap"><div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#3a86ff,#023e8a);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;position:relative;flex-shrink:0">B<div class="pon" style="background:var(--gr)"></div></div></div><div style="flex:1"><div style="font-size:13px;font-weight:600">Burak Y. <span style="font-size:10px;background:rgba(139,92,246,.1);color:var(--gold2);padding:2px 6px;border-radius:5px">🍔 Sever</span></div><div style="font-size:10px;color:var(--mu2);margin-top:1px">📍 Shake Shack • 140m</div></div><div style="font-size:10px;color:var(--gr);background:rgba(31,216,122,.08);padding:3px 7px;border-radius:6px;font-weight:600">● Orada</div></div>
+        <div class="pbody"><div style="font-size:12px;color:rgba(240,240,245,.82);line-height:1.58">Burger yiyeceğim, biri eşlik eder mi? 🍔 Startup sohbeti...</div><div class="ctags" style="margin-top:5px"><span class="ctag">🚀 Startup</span><span class="ctag">💰 Fintech</span></div></div>
+        <div class="pfoot"><button class="pbtn" onclick="openSend('Burak Y.','🍔','Shake Shack',89)">🍔 Yemek Issmarla • ₺89</button><div class="pmsg" onclick="toast2('💬 Mesaj gönderildi!')">💬</div></div>
+      </div>
+      <div class="pc" style="animation-delay:.13s">
+        <div class="ptop"><div class="av-wrap"><div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#9b5de5,#560bad);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;position:relative;flex-shrink:0">Z<div class="pon" style="background:var(--yl)"></div></div></div><div style="flex:1"><div style="font-size:13px;font-weight:600">Zeynep A. <span style="font-size:9px;color:var(--gold2)">★ VIP</span></div><div style="font-size:10px;color:var(--mu2);margin-top:1px">📍 Bar'a geçecek • 300m</div></div><div style="font-size:10px;color:var(--yl);background:rgba(255,210,38,.08);padding:3px 7px;border-radius:6px;font-weight:600">Akşam</div></div>
+        <div class="pbody"><div style="font-size:12px;color:rgba(240,240,245,.82);line-height:1.58">Akşam bira içeceğim, katılmak isteyen? 🍺 Sanat, fotoğrafçılık...</div><div class="ctags" style="margin-top:5px"><span class="ctag">📸 Fotoğraf</span><span class="ctag">🎨 Sanat</span></div></div>
+        <div class="pfoot"><button class="pbtn" onclick="openSend('Zeynep A.','🍺','Bar Luna',75)">🍺 Bira Issmarla • ₺75</button><div class="pmsg" onclick="toast2('💬 Mesaj gönderildi!')">💬</div></div>
+      </div>
+      <div class="pc" style="animation-delay:.25s">
+        <div class="ptop"><div class="av-wrap"><div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#fb8500,#c77200);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;position:relative;flex-shrink:0">A<div class="pon" style="background:var(--gr)"></div></div></div><div style="flex:1"><div style="font-size:13px;font-weight:600">Ayşe K.</div><div style="font-size:10px;color:var(--mu2);margin-top:1px">📍 Starbucks • 180m</div></div><div style="font-size:10px;color:var(--gr);background:rgba(31,216,122,.08);padding:3px 7px;border-radius:6px;font-weight:600">● Orada</div></div>
+        <div class="pbody"><div style="font-size:12px;color:rgba(240,236,255,.82);line-height:1.58">Kitap okuyorum, sohbet eşliği güzel olurdu ☕ Edebiyat, psikoloji, sinema...</div><div class="ctags" style="margin-top:5px"><span class="ctag">📖 Edebiyat</span><span class="ctag">🎬 Sinema</span><span class="ctag">🧠 Psikoloji</span></div></div>
+        <div class="pfoot"><button class="pbtn" onclick="openSend('Ayşe K.','☕','Starbucks',49)">☕ Kahve Issmarla • ₺49</button><div class="pmsg" onclick="toast2('💬 Mesaj gönderildi!','gold')">💬</div></div>
+      </div>
+      <div class="pc" style="animation-delay:.19s">
+        <div class="ptop"><div class="av-wrap"><div style="width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#06d6a0,#028a5b);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;position:relative;flex-shrink:0">M<div class="pon" style="background:var(--gr)"></div></div></div><div style="flex:1"><div style="font-size:13px;font-weight:600">Mert K.</div><div style="font-size:10px;color:var(--mu2);margin-top:1px">📍 Sushi Co. • 350m</div></div><div style="font-size:10px;color:var(--gr);background:rgba(31,216,122,.08);padding:3px 7px;border-radius:6px;font-weight:600">● Orada</div></div>
+        <div class="pbody"><div style="font-size:12px;color:rgba(240,240,245,.82);line-height:1.58">Öğle yemeği için eşlik arıyorum 🍱 Mimarlık, tasarım...</div><div class="ctags" style="margin-top:5px"><span class="ctag">🏛 Mimarlık</span><span class="ctag">🌍 Seyahat</span></div></div>
+        <div class="pfoot"><button class="pbtn" onclick="openSend('Mert K.','🍱','Sushi Co.',120)">🍱 Yemek Issmarla • ₺120</button><div class="pmsg" onclick="toast2('💬 Mesaj gönderildi!')">💬</div></div>
+      </div>
+
+      <div class="sec" style="margin-top:6px">Grup Kuponu <span>Birlikte git, fazla kazan!</span></div>
+      
+      <div class="gc-card" onclick="nav('group-coupon')">
+        <div class="gc-hero">
+          <div class="gc-ic">🍔</div>
+          <div class="gc-info">
+            <div class="gc-title">Shake Shack — Grup İndirimi</div>
+            <div class="gc-sub">4 kişi gitersen %25 indirim • Bugün geçerli</div>
+          </div>
+          <div class="gc-badge">%25</div>
+        </div>
+        <div class="gc-body">
+          <div class="gc-slots">
+            <div style="display:flex">
+              <div class="gc-av" style="background:linear-gradient(135deg,#3a86ff,#023e8a);color:#fff">B</div>
+              <div class="gc-av" style="background:linear-gradient(135deg,#06d6a0,#028a5b);color:#fff">M</div>
+              <div class="gc-av" style="background:var(--s3);color:var(--mu2);border:2px dashed var(--bd2)">+</div>
+              <div class="gc-av" style="background:var(--s3);color:var(--mu2);border:2px dashed var(--bd2)">+</div>
+            </div>
+            <div class="gc-slot-txt">2/4 katıldı • 2 yer kaldı</div>
+          </div>
+          <div class="gc-prog"><div class="gc-pb" style="width:50%"></div></div>
+          <div class="gc-footer">
+            <button class="gc-join" onclick="event.stopPropagation();doJoinGroup('Shake Shack')">Gruba Katıl →</button>
+            <div class="gc-timer">⏱ 2sa 14dk</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="gc-card" onclick="nav('group-coupon')">
+        <div class="gc-hero" style="background:linear-gradient(135deg,#1a0d1a,#2d1535)">
+          <div class="gc-ic">👗</div>
+          <div class="gc-info">
+            <div class="gc-title">Zara — Arkadaşınla Gel</div>
+            <div class="gc-sub">2 kişi gitersen her ikine %15 indirim</div>
+          </div>
+          <div class="gc-badge" style="background:rgba(233,121,249,.15);color:var(--pu)">%15</div>
+        </div>
+        <div class="gc-body">
+          <div class="gc-slots">
+            <div style="display:flex">
+              <div class="gc-av" style="background:linear-gradient(135deg,#9b5de5,#560bad);color:#fff">Z</div>
+              <div class="gc-av" style="background:var(--s3);color:var(--mu2);border:2px dashed var(--bd2)">+</div>
+            </div>
+            <div class="gc-slot-txt">1/2 katıldı • 1 yer kaldı</div>
+          </div>
+          <div class="gc-prog"><div class="gc-pb" style="width:50%;background:linear-gradient(90deg,#560bad,#e879f9)"></div></div>
+          <div class="gc-footer">
+            <button class="gc-join" style="background:linear-gradient(135deg,#560bad,#9b5de5)" onclick="event.stopPropagation();doJoinGroup('Zara')">Gruba Katıl →</button>
+            <div class="gc-timer" style="color:var(--pu)">⏱ 5sa 30dk</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bnav">
+      <div class="ni" onclick="nav('feed')"><div class="nic">🏠</div><div class="nlb">Feed</div></div>
+      <div class="ni" onclick="nav('map')"><div class="nic">🗺️</div><div class="nlb">Harita</div></div>
+      <div class="fab" onclick="nav('share')">✦</div>
+      <div class="ni on"><div class="nic">🥂</div><div class="nlb">Tanış</div></div>
+      <div class="ni" onclick="nav('rewards')"><div class="nic">🎁</div><div class="nlb">Ödüller</div></div>
+    </div>
+  </div>
+
+  <!-- MEET SEND (PAYMENT CONFIRM) -->
+  <div class="scr" id="meet-send">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('meet')">←</div><div class="pt" id="sttl">Issmarla 🥂</div></div>
+    <div class="sc" style="padding-bottom:28px">
+      <div style="background:linear-gradient(135deg,rgba(109,40,217,.1),rgba(139,92,246,.04));border:1px solid rgba(139,92,246,.18);border-radius:14px;padding:16px;margin-bottom:13px;text-align:center">
+        <div style="font-size:38px;margin-bottom:8px" id="sem">☕</div>
+        <div style="font-size:14px;font-weight:700" id="spr">Ece T.'ye</div>
+        <div style="font-size:11px;color:var(--mu2);margin-top:2px" id="spl">Starbucks'ta</div>
+        <div style="font-size:22px;font-weight:900;background:linear-gradient(135deg,#c4b5fd,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-top:8px" id="sprice">₺49</div>
+      </div>
+      <div class="flbl">Ne ısmarlamak istersin?</div>
+      <div class="tg" id="treat-grid">
+        <div class="ti on" onclick="selT(this,'☕ Kahve',49,'☕')"><div style="font-size:20px;margin-bottom:3px">☕</div><div style="font-size:11px;font-weight:500">Kahve</div><div style="font-size:11px;font-weight:700;color:var(--pu);margin-top:2px">₺49</div></div>
+        <div class="ti" onclick="selT(this,'🍺 Bira',75,'🍺')"><div style="font-size:20px;margin-bottom:3px">🍺</div><div style="font-size:11px;font-weight:500">Bira</div><div style="font-size:11px;font-weight:700;color:var(--pu);margin-top:2px">₺75</div></div>
+        <div class="ti" onclick="selT(this,'🍰 Tatlı',65,'🍰')"><div style="font-size:20px;margin-bottom:3px">🍰</div><div style="font-size:11px;font-weight:500">Tatlı</div><div style="font-size:11px;font-weight:700;color:var(--pu);margin-top:2px">₺65</div></div>
+        <div class="ti" onclick="selT(this,'🍽 Yemek',150,'🍽')"><div style="font-size:20px;margin-bottom:3px">🍽</div><div style="font-size:11px;font-weight:500">Yemek</div><div style="font-size:11px;font-weight:700;color:var(--pu);margin-top:2px">₺150</div></div>
+      </div>
+      <div class="flbl">Not (isteğe bağlı)</div>
+      <textarea class="ta" placeholder="Merhaba! Sohbet etmek ister misin? 😊" style="min-height:62px;margin-bottom:12px"></textarea>
+      <div class="pay-box">
+        <div class="pay-row"><span class="pay-lbl">Issmarla tutarı</span><span class="pay-val" id="pay-amt-s">₺49,00</span></div>
+        <div class="pay-row"><span class="pay-lbl">Ödeme yöntemi</span><span class="pay-val">💳 VISA •4242</span></div>
+        <div class="pay-row"><span class="pay-lbl">Mevcut bakiye</span><span class="pay-val">₺247,50</span></div>
+        <div class="pay-row"><span class="pay-lbl">İşlem sonrası bakiye</span><span class="pay-total" id="after-bal">₺198,50</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:10px;background:rgba(31,216,122,.05);border:1px solid rgba(31,216,122,.1);border-radius:9px;margin-bottom:12px;font-size:11px;color:var(--mu2)">
+        🔒 Karşı taraf kabul ederse ödeme gerçekleşir. Reddedilirse iade edilir.
+      </div>
+      <button class="bp" id="sbtn" onclick="doSend()">Ödemeyi Onayla & Issmarla →</button>
+    </div>
+  </div>
+
+  <!-- PAYMENT SUCCESS -->
+  <div class="scr" id="pay-success">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center">
+      <div style="width:80px;height:80px;background:rgba(139,92,246,.15);border:2px solid rgba(139,92,246,.35);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;margin-bottom:18px">✓</div>
+      <div style="font-size:22px;font-weight:800;margin-bottom:6px">Issmarlandı! 🥂</div>
+      <div style="font-size:13px;color:var(--mu2);line-height:1.65;margin-bottom:24px" id="success-msg">Ece T. onaylarsa kahve hazırlanacak!</div>
+      <div style="background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:16px;width:100%;margin-bottom:20px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:11px;color:var(--mu2)">İşlem no</span><span style="font-size:11px;font-weight:600">#NB-2847561</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:11px;color:var(--mu2)">Tutar</span><span style="font-size:11px;font-weight:700;color:var(--gold2)" id="succ-amt">₺49,00</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--mu2)">Yeni bakiye</span><span style="font-size:11px;font-weight:700;color:var(--gr)" id="succ-bal">₺198,50</span></div>
+      </div>
+      <button class="bp" style="width:100%;margin-bottom:8px" onclick="nav('meet')">Geri Dön</button>
+      <button class="bg" style="width:100%" onclick="nav('wallet')">İşlem Geçmişi</button>
+    </div>
+  </div>
+
+  <!-- SHARE -->
+  <div class="scr" id="share">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('feed')">←</div><div class="pt">Deneyim Paylaş</div></div>
+    <div class="sc" style="padding-bottom:28px">
+      <div class="flbl">Mekân</div>
+      <div style="background:var(--s1);border:1.5px solid var(--bd);border-radius:11px;padding:10px 12px;display:flex;align-items:center;gap:8px;margin-bottom:11px;cursor:pointer" onclick="document.getElementById('PM').classList.add('on')">
+        <span>📍</span><div id="plt" style="flex:1;color:var(--mu);font-size:12px">Mekân seç...</div><span style="color:var(--mu);font-size:11px">›</span>
+      </div>
+      <div class="flbl">Deneyimini anlat</div>
+      <textarea class="ta" id="sha" placeholder="Ne yaşadın? 💬" oninput="upCC(this)"></textarea>
+      <div style="text-align:right;font-size:10px;color:var(--mu);margin-bottom:11px" id="cc">0 / 500</div>
+      <div class="flbl">Puan ver</div>
+      <div class="stars" id="strs"><span class="star" onclick="setStar(1)">⭐</span><span class="star" onclick="setStar(2)">⭐</span><span class="star" onclick="setStar(3)">⭐</span><span class="star" onclick="setStar(4)">⭐</span><span class="star" onclick="setStar(5)">⭐</span></div>
+      <div class="flbl">Medya</div>
+      <div class="mor">
+        <div class="mo" onclick="this.classList.toggle('on')"><div style="font-size:17px;margin-bottom:2px">📷</div><div style="font-size:10px;color:var(--mu2)">Foto</div></div>
+        <div class="mo" onclick="this.classList.toggle('on')"><div style="font-size:17px;margin-bottom:2px">🎬</div><div style="font-size:10px;color:var(--mu2)">Video</div></div>
+        <div class="mo" onclick="this.classList.toggle('on')"><div style="font-size:17px;margin-bottom:2px">📊</div><div style="font-size:10px;color:var(--mu2)">Anket</div></div>
+      </div>
+      <div class="camp-h" id="ch" style="display:none"><span>🎁</span><div style="flex:1"><div style="font-size:11px;font-weight:600;color:var(--gold2)" id="chn">Aktif Kampanya!</div><div style="font-size:10px;color:var(--mu2);margin-top:1px" id="chd">50 beğeni = ödül</div></div><span style="font-size:10px;color:var(--gold)">›</span></div>
+      <button class="bp" onclick="doShare()">Paylaş →</button>
+    </div>
+  </div>
+
+  <!-- MAP -->
+  <div class="scr" id="map">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="tb"><div class="logo">NearBuzz</div><div class="ib" onclick="nav('feed')">✕</div></div>
+    <div class="mfk">
+      <svg style="position:absolute;inset:0;width:100%;height:100%;opacity:.07"><defs><pattern id="g" width="26" height="26" patternUnits="userSpaceOnUse"><path d="M26 0L0 0 0 26" fill="none" stroke="rgba(255,255,255,.6)" stroke-width=".4"/></pattern></defs><rect width="100%" height="100%" fill="url(#g)"/></svg>
+      <div style="position:absolute;top:38%;left:0;right:0;height:2px;background:rgba(139,92,246,.08)"></div>
+      <div style="position:absolute;top:62%;left:0;right:0;height:3px;background:rgba(201,168,76,.05)"></div>
+      <div style="position:absolute;top:0;bottom:0;left:33%;width:2px;background:rgba(139,92,246,.08)"></div>
+      <div style="position:absolute;top:0;bottom:0;left:66%;width:3px;background:rgba(201,168,76,.05)"></div>
+      <div class="mrg" style="width:240px;height:240px;top:50%;left:50%;transform:translate(-50%,-50%)"></div>
+      <div class="myu" style="top:50%;left:50%;transform:translate(-50%,-50%)"></div>
+      <div class="mpn" style="top:22%;left:28%;transform:translate(-50%,-100%)" onclick="toast2('🏬 Zara: 4 paylaşım, aktif kampanya')"><div class="mpb" style="background:#ff4d26">🏬 Zara</div><div class="mpt" style="background:#ff4d26"></div></div>
+      <div class="mpn" style="top:42%;left:68%;transform:translate(-50%,-100%)" onclick="toast2('🍔 Shake Shack: 2 paylaşım')"><div class="mpb" style="background:#3d8eff">🍔 Shake Shack</div><div class="mpt" style="background:#3d8eff"></div></div>
+      <div class="mpn" style="top:62%;left:42%;transform:translate(-50%,-100%)" onclick="toast2('☕ Starbucks')"><div class="mpb" style="background:#1fd87a;color:#062015">☕ Starbucks</div><div class="mpt" style="background:#1fd87a"></div></div>
+      <div class="mpn" style="top:30%;left:58%;transform:translate(-50%,-100%)" onclick="toast2('👗 H&M: 3 paylaşım')"><div class="mpb" style="background:#9b6dff">👗 H&amp;M</div><div class="mpt" style="background:#9b6dff"></div></div>
+      <div class="mpn" style="top:70%;left:60%;transform:translate(-50%,-100%)" onclick="toast2('🍱 Sushi Co.')"><div class="mpb" style="background:var(--gold);color:#1a0a00">🍱 Sushi Co.</div><div class="mpt" style="background:var(--gold)"></div></div>
+      <div class="mov"><span style="font-size:22px">📍</span><div style="flex:1"><div style="font-size:12px;font-weight:600">Cevahir AVM çevresinde</div><div style="font-size:10px;color:var(--mu2);margin-top:1px">7 paylaşım • 4 kampanya • 8 kişi</div></div><div style="font-size:10px;color:var(--gold2);font-weight:600;background:rgba(139,92,246,.1);padding:3px 8px;border-radius:7px">● Canlı</div></div>
+    </div>
+    <div class="bnav">
+      <div class="ni" onclick="nav('feed')"><div class="nic">🏠</div><div class="nlb">Feed</div></div>
+      <div class="ni on"><div class="nic">🗺️</div><div class="nlb">Harita</div></div>
+      <div class="fab" onclick="nav('share')">✦</div>
+      <div class="ni" onclick="nav('meet')"><div class="nic">🥂</div><div class="nlb">Tanış</div></div>
+      <div class="ni" onclick="nav('rewards')"><div class="nic">🎁</div><div class="nlb">Ödüller</div></div>
+    </div>
+  </div>
+
+  <!-- REWARDS -->
+  <div class="scr" id="rewards">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div style="padding:7px 16px 10px;flex-shrink:0"><div style="font-size:22px;font-weight:800">Ödüllerim 🎁</div><div style="color:var(--mu2);font-size:11px;margin-top:2px">Paylaşımlarınla gerçek ödüller kazan</div></div>
+    <div class="sc">
+      <div class="mys">
+        <div class="str"><div><div class="sv" style="color:var(--gold2)">247</div><div class="sk">Beğeni</div></div><div><div class="sv" style="color:var(--gr)">14</div><div class="sk">Paylaşım</div></div><div><div class="sv" style="color:var(--bl)">3</div><div class="sk">Ödül</div></div></div>
+        <div class="rnk">★ Top 5% İçerik Üreticisi</div>
+      </div>
+      <div class="sec">Kullanılabilir</div>
+      <div class="rwc"><div class="rwic" style="background:rgba(201,168,76,.1)">🏷️</div><div style="flex:1"><div style="font-size:12px;font-weight:500">Zara %10 İndirim</div><div style="font-size:10px;color:var(--mu2);margin-top:1px">NEAR-ZR-7842 • 30 Haz</div></div><div class="rwst srd" onclick="toast2('📋 Kod kopyalandı!')">Kullan</div></div>
+      <div class="rwc"><div class="rwic" style="background:rgba(31,216,122,.1)">☕</div><div style="flex:1"><div style="font-size:12px;font-weight:500">Starbucks Ücretsiz Kahve</div><div style="font-size:10px;color:var(--mu2);margin-top:1px">QR ile kullan</div></div><div class="rwst srd" onclick="toast2('☕ QR göster')">QR</div></div>
+      <div class="rwc"><div class="rwic" style="background:rgba(155,109,255,.1)">🎫</div><div style="flex:1"><div style="font-size:12px;font-weight:500">Sushi Co. %20 İndirim</div><div style="font-size:10px;color:var(--mu2);margin-top:1px">Öğle 12-15</div></div><div class="rwst srd" onclick="toast2('🍱 Aktif!')">Kullan</div></div>
+      <div class="sec" style="margin-top:6px">Devam Edenler</div>
+      <div class="rwc" style="flex-direction:column;align-items:flex-start">
+        <div style="display:flex;align-items:center;gap:9px;width:100%"><div class="rwic" style="background:rgba(255,122,69,.1)">🍔</div><div style="flex:1"><div style="font-size:12px;font-weight:500">Shake Shack Bedava Patates</div><div style="font-size:10px;color:var(--mu2)">50 beğeni</div></div><div class="rwst spg">38/50</div></div>
+        <div style="width:100%;margin-top:7px"><div class="prog" style="height:4px"><div class="pb" style="width:76%"></div></div></div>
+      </div>
+    </div>
+    <div class="bnav">
+      <div class="ni" onclick="nav('feed')"><div class="nic">🏠</div><div class="nlb">Feed</div></div>
+      <div class="ni" onclick="nav('map')"><div class="nic">🗺️</div><div class="nlb">Harita</div></div>
+      <div class="fab" onclick="nav('share')">✦</div>
+      <div class="ni" onclick="nav('meet')"><div class="nic">🥂</div><div class="nlb">Tanış</div></div>
+      <div class="ni on"><div class="nic">🎁</div><div class="nlb">Ödüller</div></div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="scr" id="profile">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('feed')">←</div><div class="pt">Profilim</div><div class="ib" onclick="nav('settings')">⚙️</div></div>
+    <div class="sc">
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="width:72px;height:72px;background:linear-gradient(135deg,#4c1d95,#6d28d9,#8b5cf6);border-radius:22px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:#fff;box-shadow:0 10px 30px rgba(109,40,217,.4),0 0 40px rgba(139,92,246,.2)">S</div>
+        <div style="font-size:18px;font-weight:700">Siz</div>
+        <div style="color:var(--mu2);font-size:11px;margin-top:2px">📍 İstanbul • Ocak 2026</div>
+        <div style="display:inline-flex;align-items:center;gap:4px;background:rgba(139,92,246,.09);border:1px solid rgba(139,92,246,.16);border-radius:17px;padding:4px 10px;margin-top:8px"><span>★</span><span style="font-size:10px;color:var(--gold2);font-weight:600">Top İçerik Üreticisi</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:16px">
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:11px;padding:11px;text-align:center"><div style="font-size:19px;font-weight:800;color:var(--gold2)">14</div><div style="font-size:9px;color:var(--mu2);margin-top:1px">Paylaşım</div></div>
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:11px;padding:11px;text-align:center"><div style="font-size:19px;font-weight:800;color:var(--gr)">247</div><div style="font-size:9px;color:var(--mu2);margin-top:1px">Beğeni</div></div>
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:11px;padding:11px;text-align:center"><div style="font-size:19px;font-weight:800;color:var(--bl)">3</div><div style="font-size:9px;color:var(--mu2);margin-top:1px">Ödül</div></div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(109,40,217,.08),rgba(139,92,246,.04));border:1px solid rgba(139,92,246,.14);border-radius:12px;padding:12px;margin-bottom:14px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="nav('wallet')">
+        <span style="font-size:20px">💳</span>
+        <div style="flex:1"><div style="font-size:12px;font-weight:600">Cüzdanım</div><div style="font-size:10px;color:var(--mu2);margin-top:1px">Bakiye: ₺247,50</div></div>
+        <div style="font-size:11px;color:var(--gold);font-weight:600">Görüntüle ›</div>
+      </div>
+      <div class="sec">Son Paylaşımlarım</div>
+      <div class="card"><div class="ct"><div class="av" style="background:linear-gradient(135deg,#ff4d26,#ff7a45)">S</div><div class="ai"><div class="an">Siz</div><div class="ap">📍 Zara</div></div><div class="at">4dk</div></div><div class="cb"><div class="ctxt">Yazlık elbiseler %40 indirimde! 🔥</div></div><div class="cf"><button class="act liked"><span class="aic">❤️</span><span>38</span></button><button class="act"><span class="aic">💬</span><span>12</span></button></div></div>
+    </div>
+    <div class="bnav">
+      <div class="ni" onclick="nav('feed')"><div class="nic">🏠</div><div class="nlb">Feed</div></div>
+      <div class="ni" onclick="nav('map')"><div class="nic">🗺️</div><div class="nlb">Harita</div></div>
+      <div class="fab" onclick="nav('share')">✦</div>
+      <div class="ni" onclick="nav('meet')"><div class="nic">🥂</div><div class="nlb">Tanış</div></div>
+      <div class="ni" onclick="nav('rewards')"><div class="nic">🎁</div><div class="nlb">Ödüller</div></div>
+    </div>
+  </div>
+
+  
+  <!-- SETTINGS & PRIVACY -->
+  <div class="scr" id="settings">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('profile')">←</div><div class="pt">Ayarlar & Gizlilik</div></div>
+    <div class="sc" style="padding-bottom:28px">
+
+      <div class="sec">Yasal & Gizlilik</div>
+      <div class="pol-link" onclick="nav('privacy')">
+        <div class="pol-link-ic" style="background:rgba(139,92,246,.1)">🔒</div>
+        <div><div class="pol-link-n">Gizlilik Politikası</div><div class="pol-link-s">Verilerini nasıl koruduğumuzu öğren</div></div>
+        <div class="pol-link-arr">›</div>
+      </div>
+      <div class="pol-link" onclick="nav('terms')">
+        <div class="pol-link-ic" style="background:rgba(61,198,255,.1)">📄</div>
+        <div><div class="pol-link-n">Kullanım Şartları</div><div class="pol-link-s">NearBuzz kullanım koşulları</div></div>
+        <div class="pol-link-arr">›</div>
+      </div>
+      <div class="pol-link" onclick="nav('content-policy')">
+        <div class="pol-link-ic" style="background:rgba(239,68,68,.1)">🛡️</div>
+        <div><div class="pol-link-n">İçerik Politikası</div><div class="pol-link-s">Uygunsuz içerik kuralları</div></div>
+        <div class="pol-link-arr">›</div>
+      </div>
+      <div class="pol-link" onclick="nav('complaint')">
+        <div class="pol-link-ic" style="background:rgba(251,146,60,.1)">📢</div>
+        <div><div class="pol-link-n">Şikayet & Destek</div><div class="pol-link-s">Sorununu bize ilet</div></div>
+        <div class="pol-link-arr">›</div>
+      </div>
+      <div class="pol-link" onclick="nav('report-user')">
+        <div class="pol-link-ic" style="background:rgba(239,68,68,.08)">🚩</div>
+        <div><div class="pol-link-n">Kullanıcı Şikayet Et</div><div class="pol-link-s">Uygunsuz davranış bildir</div></div>
+        <div class="pol-link-arr">›</div>
+      </div>
+
+      <div class="sec" style="margin-top:6px">Hesap</div>
+      <div class="pol-link" onclick="toast2('🔒 Şifre değiştirme maili gönderildi','ok')">
+        <div class="pol-link-ic" style="background:rgba(16,185,129,.1)">🔑</div>
+        <div><div class="pol-link-n">Şifre Değiştir</div><div class="pol-link-s">E-posta ile güvenli değiştir</div></div>
+        <div class="pol-link-arr">›</div>
+      </div>
+      <div class="pol-link" onclick="toast2('📧 Bildirim ayarları güncellendi','ok')">
+        <div class="pol-link-ic" style="background:rgba(139,92,246,.1)">🔔</div>
+        <div><div class="pol-link-n">Bildirim Ayarları</div><div class="pol-link-s">Push, e-posta, SMS tercihler</div></div>
+        <div class="pol-link-arr">›</div>
+      </div>
+      <div class="pol-link" onclick="toast2('📍 Konum izni ayarları','gold')">
+        <div class="pol-link-ic" style="background:rgba(139,92,246,.08)">📍</div>
+        <div><div class="pol-link-n">Konum İzinleri</div><div class="pol-link-s">Konum paylaşım tercihlerini yönet</div></div>
+        <div class="pol-link-arr">›</div>
+      </div>
+
+      <div class="danger-zone">
+        <div class="danger-title">⚠️ Tehlikeli Bölge</div>
+        <button class="danger-btn" onclick="nav('delete-account')">🗑️ Hesabımı Kalıcı Sil</button>
+        <button class="danger-btn" onclick="toast2('📤 Veriler 24sa içinde e-postayla gönderilir','ok')">📤 Verilerimi İndir</button>
+        <button class="danger-btn" onclick="toast2('🚪 Çıkış yapıldı','ok');setTimeout(()=>nav('login'),800)">🚪 Çıkış Yap</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIVACY POLICY -->
+  <div class="scr" id="privacy">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('settings')">←</div><div class="pt">Gizlilik Politikası</div></div>
+    <div class="sc" style="padding-bottom:28px">
+      <div style="font-size:10px;color:var(--mu2);margin-bottom:14px">Son güncelleme: 22 Şubat 2026</div>
+
+      <div class="pol-section">
+        <div class="pol-title">🔒 Topladığımız Veriler</div>
+        <div class="pol-txt">NearBuzz olarak yalnızca hizmetimizi sunmak için gerekli minimum veriyi toplarız:<br><br>
+        <b>Konum verisi</b> — Uygulama açıkken yakın mekânları göstermek için. Arka planda konum erişimi kullanmayız. Konumun 500m hassasiyete yuvarlanarak saklanır, kesin koordinatın asla üçüncü taraflarla paylaşılmaz.<br><br>
+        <b>Profil bilgisi</b> — Ad, telefon/e-posta, profil fotoğrafı. Gerçek adın hiçbir zaman diğer kullanıcılara gösterilmez; yalnızca ilk adın ve soy adının baş harfi görünür (örn. "Ayşe K.")<br><br>
+        <b>Ödeme verisi</b> — Kart bilgilerin <b>hiçbir zaman</b> NearBuzz sunucularında saklanmaz. Tüm ödeme işlemleri iyzico / Stripe altyapısıyla işlenir ve PCI-DSS standartlarına uygundur.<br><br>
+        <b>İçerik</b> — Paylaştığın fotoğraf, video ve metinler. İstediğin zaman silebilirsin.</div>
+      </div>
+
+      <div class="pol-section">
+        <div class="pol-title">🚫 Yapmadıklarımız</div>
+        <div class="pol-txt">
+        • Verilerini <b>reklam amaçlı üçüncü taraflara satmayız</b><br>
+        • Hassas konumunu (tam adres) kaydetmeyiz<br>
+        • Uygulama kapalıyken konum takibi yapmayız<br>
+        • Kart numaranı görmeyiz veya saklamayız<br>
+        • Gerçek adını diğer kullanıcılara açıklamayız</div>
+      </div>
+
+      <div class="pol-section">
+        <div class="pol-title">📤 Haklarını</div>
+        <div class="pol-txt">
+        <b>Erişim hakkı</b> — Hakkındaki tüm veriyi talep edebilirsin.<br>
+        <b>Silme hakkı</b> — Hesabını sildiğinde tüm verilerin 30 gün içinde kalıcı olarak silinir.<br>
+        <b>Taşıma hakkı</b> — Verilerini JSON formatında indirebilirsin.<br>
+        <b>İtiraz hakkı</b> — <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6212100b1403011b220c070310001718184c031212">[email&#160;protected]</a> adresine yazabilirsin.</div>
+      </div>
+
+      <div class="pol-section">
+        <div class="pol-title">🍪 Çerezler</div>
+        <div class="pol-txt">Yalnızca oturum ve güvenlik amacıyla zorunlu çerezler kullanılır. Pazarlama çerezi kullanmıyoruz.</div>
+      </div>
+
+      <div style="background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.14);border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:11px;color:var(--mu2);line-height:1.7">Sorularınız için<br><b style="color:var(--gold2)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4030322936212339002e25213222353a3a6e213030">[email&#160;protected]</a></b><br>adresine yazabilirsiniz.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TERMS -->
+  <div class="scr" id="terms">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('settings')">←</div><div class="pt">Kullanım Şartları</div></div>
+    <div class="sc" style="padding-bottom:28px">
+      <div style="font-size:10px;color:var(--mu2);margin-bottom:14px">Son güncelleme: 22 Şubat 2026</div>
+      <div class="pol-section">
+        <div class="pol-title">📋 Kabul Ettiğin Kurallar</div>
+        <div class="pol-txt">NearBuzz'ı kullanarak aşağıdaki kurallara uymayı kabul edersin:<br><br>
+        <b>1. Gerçek kimlik</b> — Sahte hesap açmak yasaktır.<br>
+        <b>2. Yaş sınırı</b> — 13 yaş altı kullanamaz. Alkol içeren ısmarlama özelliği 18+.<br>
+        <b>3. Konum doğruluğu</b> — Sahte konum oluşturma yasaktır.<br>
+        <b>4. Issmarla kuralı</b> — Karşı taraf reddettiğinde ödeme tam iade edilir. Kötüye kullanım hesap askıya alınmasına yol açar.<br>
+        <b>5. İçerik sorumluluğu</b> — Paylaştığın içerikten hukuken sen sorumlusun.<br>
+        <b>6. Ticari kullanım</b> — İzinsiz reklam ve spam içerik paylaşılamaz.</div>
+      </div>
+      <div class="pol-section">
+        <div class="pol-title">⚖️ İhtilaf Çözümü</div>
+        <div class="pol-txt">Uyuşmazlıklarda <b>İstanbul</b> mahkemeleri yetkilidir. Türk hukuku geçerlidir.</div>
+      </div>
+      <div style="background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.14);border-radius:12px;padding:12px;text-align:center">
+        <div style="font-size:11px;color:var(--mu2);line-height:1.7">Hukuki sorular için<br><b style="color:var(--gold2)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d2beb7b5b3be92bcb7b3a0b0a7a8a8fcb3a2a2">[email&#160;protected]</a></b></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT POLICY -->
+  <div class="scr" id="content-policy">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('settings')">←</div><div class="pt">İçerik Politikası 🛡️</div></div>
+    <div class="sc" style="padding-bottom:28px">
+
+      <div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:14px;padding:13px;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:#f87171;margin-bottom:8px">🚫 Kesinlikle Yasak İçerikler</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="font-size:13px;flex-shrink:0">🔞</span><div style="font-size:11px;color:var(--mu3);line-height:1.5"><b style="color:var(--tx)">Uygunsuz cinsel içerik</b> — Her türlü açık cinsel içerik yasaktır.</div></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="font-size:13px;flex-shrink:0">🎯</span><div style="font-size:11px;color:var(--mu3);line-height:1.5"><b style="color:var(--tx)">Taciz & zorbalık</b> — Kişileri hedef alan saldırgan içerik yasaktır.</div></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="font-size:13px;flex-shrink:0">💀</span><div style="font-size:11px;color:var(--mu3);line-height:1.5"><b style="color:var(--tx)">Şiddet & tehdit</b> — Şiddet içeren veya tehdit oluşturan içerik yasaktır.</div></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="font-size:13px;flex-shrink:0">🎭</span><div style="font-size:11px;color:var(--mu3);line-height:1.5"><b style="color:var(--tx)">Nefret söylemi</b> — Irk, din, cinsiyet bazlı ayrımcı içerik yasaktır.</div></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="font-size:13px;flex-shrink:0">📍</span><div style="font-size:11px;color:var(--mu3);line-height:1.5"><b style="color:var(--tx)">Sahte konum / spam</b> — Yanıltıcı mekân bilgisi ve reklam spam'ı yasaktır.</div></div>
+          <div style="display:flex;gap:8px;align-items:flex-start"><span style="font-size:13px;flex-shrink:0">💊</span><div style="font-size:11px;color:var(--mu3);line-height:1.5"><b style="color:var(--tx)">Yasadışı faaliyet</b> — Uyuşturucu, silah veya yasadışı mal/hizmet paylaşımı yasaktır.</div></div>
+        </div>
+      </div>
+
+      <div class="pol-section">
+        <div class="pol-title">✅ İzin Verilen İçerikler</div>
+        <div class="pol-txt">
+        • Mekân deneyimleri, yorumlar, fotoğraflar<br>
+        • Yemek, alışveriş, eğlence içerikleri<br>
+        • Etkinlik duyuruları<br>
+        • Samimi mekân değerlendirmeleri (olumlu veya olumsuz)<br>
+        • İşletme kampanya ve indirim duyuruları</div>
+      </div>
+
+      <div class="pol-section">
+        <div class="pol-title">⚡ Yaptırımlar</div>
+        <div class="pol-txt">
+        <b>1. Uyarı</b> — İlk ihlalde içerik kaldırılır, bildirim gönderilir.<br>
+        <b>2. Geçici askı</b> — Tekrar ihlalde 7-30 gün hesap askıya alınır.<br>
+        <b>3. Kalıcı ban</b> — Ağır ihlallerde hesap kalıcı olarak kapatılır ve gerektiğinde yetkililere bildirilir.<br><br>
+        <b>İtiraz hakkın var.</b> Haksız kaldırma kararlarına 7 gün içinde itiraz edebilirsin.</div>
+      </div>
+
+      <div class="pol-section">
+        <div class="pol-title">🤖 Moderasyon</div>
+        <div class="pol-txt">İçerikler yapay zeka destekli otomatik filtreleme <b>ve</b> insan moderatörler tarafından denetlenir. 7/24 aktif moderasyon ekibimiz vardır.</div>
+      </div>
+
+      <button class="bp" onclick="nav('report-content')">İçerik Raporla 🚩</button>
+    </div>
+  </div>
+
+  <!-- COMPLAINT SCREEN -->
+  <div class="scr" id="complaint">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('settings')">←</div><div class="pt">Şikayet & Destek 📢</div></div>
+    <div class="sc" style="padding-bottom:28px">
+
+      <div style="background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.14);border-radius:14px;padding:13px;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--gold2);margin-bottom:6px">Nasıl çalışır?</div>
+        <div class="comp-step"><div class="comp-step-n">1</div><div><div class="comp-step-t">Şikayetini ilet</div><div class="comp-step-s">Formu doldur, kanıt ekle</div></div></div>
+        <div class="comp-step"><div class="comp-step-n">2</div><div><div class="comp-step-t">24 saat içinde yanıt</div><div class="comp-step-s">Destek ekibimiz inceleyip sana bildirir</div></div></div>
+        <div class="comp-step" style="margin-bottom:0"><div class="comp-step-n">3</div><div><div class="comp-step-t">Çözüm</div><div class="comp-step-s">İçerik kaldırma, iade, hesap aksiyonu</div></div></div>
+      </div>
+
+      <div class="flbl">Şikayet Türü</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:13px">
+        <div class="rep-opt on" onclick="selComp(this)"><div class="rep-ic">📝</div><div class="rep-n">İçerik şikayeti</div><div class="rep-chk on">✓</div></div>
+        <div class="rep-opt" onclick="selComp(this)"><div class="rep-ic">👤</div><div class="rep-n">Kullanıcı şikayeti</div><div class="rep-chk"></div></div>
+        <div class="rep-opt" onclick="selComp(this)"><div class="rep-ic">💳</div><div class="rep-n">Ödeme / iade sorunu</div><div class="rep-chk"></div></div>
+        <div class="rep-opt" onclick="selComp(this)"><div class="rep-ic">🏢</div><div class="rep-n">İşletme şikayeti</div><div class="rep-chk"></div></div>
+        <div class="rep-opt" onclick="selComp(this)"><div class="rep-ic">🔧</div><div class="rep-n">Teknik sorun</div><div class="rep-chk"></div></div>
+        <div class="rep-opt" onclick="selComp(this)"><div class="rep-ic">📌</div><div class="rep-n">Diğer</div><div class="rep-chk"></div></div>
+      </div>
+
+      <div class="flbl">Açıklama</div>
+      <textarea class="ta" style="min-height:90px;margin-bottom:5px" placeholder="Şikayetini detaylıca anlat. Ne oldu, ne zaman oldu, kimler dahildi..."></textarea>
+      <div style="text-align:right;font-size:10px;color:var(--mu);margin-bottom:11px">0 / 1000</div>
+
+      <div class="flbl">İletişim (isteğe bağlı)</div>
+      <div class="fw"><span class="fi">📧</span><input class="fld" type="email" placeholder="e-posta@adresin.com"></div>
+
+      <div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.12);border-radius:11px;padding:10px;margin-bottom:13px;font-size:11px;color:var(--mu2);line-height:1.6">
+        🔒 Şikayetin gizli tutulur. Şikayet ettiğin kişi kimliğini öğrenemez.
+      </div>
+      <button class="bp" onclick="doComplaint()">Şikayeti Gönder →</button>
+
+      <div class="sec" style="margin-top:14px">Acil İletişim</div>
+      <div class="pol-link" onclick="toast2('📧 destek@nearbuzz.app','gold')">
+        <div class="pol-link-ic" style="background:rgba(139,92,246,.1)">📧</div>
+        <div><div class="pol-link-n">E-posta Desteği</div><div class="pol-link-s"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6a0e0f191e0f012a040f0b18081f1010440b1a1a">[email&#160;protected]</a> • 24sa yanıt</div></div>
+      </div>
+      <div class="pol-link" onclick="toast2('💬 Canlı destek başlatılıyor...','ok')">
+        <div class="pol-link-ic" style="background:rgba(16,185,129,.1)">💬</div>
+        <div><div class="pol-link-n">Canlı Destek</div><div class="pol-link-s">09:00–22:00 arası aktif</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORT CONTENT MODAL (also triggered from cards) -->
+  <div class="scr" id="report-content">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" id="rep-back" onclick="nav('feed')">←</div><div class="pt">İçerik Raporla 🚩</div></div>
+    <div class="sc" style="padding-bottom:28px">
+      <div style="background:var(--s1);border:1px solid var(--bd);border-radius:13px;padding:11px;margin-bottom:13px;display:flex;align-items:center;gap:9px">
+        <div style="font-size:18px">🚩</div>
+        <div style="font-size:12px;color:var(--mu2);line-height:1.5" id="rep-target">Raporlanan içerik: <b style="color:var(--tx)">Seçili içerik</b></div>
+      </div>
+
+      <div class="flbl">Rapor Sebebi</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:13px">
+        <div class="rep-opt" onclick="selRep(this)"><div class="rep-ic">🔞</div><div class="rep-n">Uygunsuz / müstehcen içerik</div><div class="rep-chk"></div></div>
+        <div class="rep-opt" onclick="selRep(this)"><div class="rep-ic">😡</div><div class="rep-n">Taciz veya zorbalık</div><div class="rep-chk"></div></div>
+        <div class="rep-opt" onclick="selRep(this)"><div class="rep-ic">💢</div><div class="rep-n">Nefret söylemi</div><div class="rep-chk"></div></div>
+        <div class="rep-opt" onclick="selRep(this)"><div class="rep-ic">❌</div><div class="rep-n">Yanlış / yanıltıcı bilgi</div><div class="rep-chk"></div></div>
+        <div class="rep-opt" onclick="selRep(this)"><div class="rep-ic">📢</div><div class="rep-n">İzinsiz reklam / spam</div><div class="rep-chk"></div></div>
+        <div class="rep-opt" onclick="selRep(this)"><div class="rep-ic">💊</div><div class="rep-n">Yasadışı içerik</div><div class="rep-chk"></div></div>
+        <div class="rep-opt on" onclick="selRep(this)"><div class="rep-ic">📌</div><div class="rep-n">Diğer</div><div class="rep-chk on">✓</div></div>
+      </div>
+
+      <div class="flbl">Ek not (isteğe bağlı)</div>
+      <textarea class="ta" style="min-height:70px;margin-bottom:13px" placeholder="Daha fazla detay ekleyebilirsin..."></textarea>
+
+      <div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.12);border-radius:11px;padding:10px;margin-bottom:13px;font-size:11px;color:var(--mu2);line-height:1.6">
+        🔒 Raporun anonim kalır. İçerik sahibi kim raporladığını göremez.
+      </div>
+      <button class="bp" onclick="doReport()">Raporu Gönder →</button>
+    </div>
+  </div>
+
+  <!-- REPORT USER -->
+  <div class="scr" id="report-user">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('settings')">←</div><div class="pt">Kullanıcı Şikayet Et</div></div>
+    <div class="sc" style="padding-bottom:28px">
+      <div class="flbl">Kullanıcı Adı / Profil</div>
+      <div class="fw"><span class="fi">👤</span><input class="fld" type="text" placeholder="@kullaniciadi veya profil linki"></div>
+      <div class="flbl">Şikayet Sebebi</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:13px">
+        <div class="rep-opt on" onclick="selRep(this)"><div class="rep-ic">😡</div><div class="rep-n">Taciz veya uygunsuz mesaj</div><div class="rep-chk on">✓</div></div>
+        <div class="rep-opt" onclick="selRep(this)"><div class="rep-ic">🎭</div><div class="rep-n">Sahte hesap / kimlik taklidi</div><div class="rep-chk"></div></div>
+        <div class="rep-opt" onclick="selRep(this)"><div class="rep-ic">💸</div><div class="rep-n">Dolandırıcılık girişimi</div><div class="rep-chk"></div></div>
+        <div class="rep-opt" onclick="selRep(this)"><div class="rep-ic">🚫</div><div class="rep-n">Issmarla özelliğini kötüye kullanma</div><div class="rep-chk"></div></div>
+        <div class="rep-opt" onclick="selRep(this)"><div class="rep-ic">📌</div><div class="rep-n">Diğer</div><div class="rep-chk"></div></div>
+      </div>
+      <div class="flbl">Açıklama</div>
+      <textarea class="ta" style="min-height:80px;margin-bottom:13px" placeholder="Ne yaşandığını anlat..."></textarea>
+      <div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.12);border-radius:11px;padding:10px;margin-bottom:13px;font-size:11px;color:var(--mu2);line-height:1.6">
+        Ağır ihlallerde (tehdit, dolandırıcılık) kullanıcı <b style="color:var(--tx)">anında askıya alınır</b> ve gerektiğinde yetkililere bildirilir.
+      </div>
+      <button class="bp" onclick="doReport()">Şikayeti Gönder →</button>
+    </div>
+  </div>
+
+  <!-- DELETE ACCOUNT -->
+  <div class="scr" id="delete-account">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('settings')">←</div><div class="pt">Hesabı Sil</div></div>
+    <div class="sc" style="padding-bottom:28px">
+
+      <div class="del-warn">
+        <div class="del-warn-t">⚠️ Hesabını silersen geri alınamaz:</div>
+        <div class="del-item">Tüm paylaşımların ve fotoğrafların silinir</div>
+        <div class="del-item">Kazanılmamış ödül puanların silinir</div>
+        <div class="del-item">Cüzdan bakiyen iade <b>edilmez</b> (önce harcamanı öneririz)</div>
+        <div class="del-item">Profil ve geçmiş tüm veriler 30 gün içinde kalıcı silinir</div>
+        <div class="del-item">Aynı telefon/e-postayla yeni hesap açabilirsin</div>
+      </div>
+
+      <div class="pol-section">
+        <div class="pol-title">💡 Bunları denedin mi?</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div class="pol-link" onclick="toast2('🔕 Bildirimler kapatıldı','ok')">
+            <div class="pol-link-ic" style="background:rgba(139,92,246,.08)">🔕</div>
+            <div><div class="pol-link-n">Bildirimleri kapat</div><div class="pol-link-s">Rahatsız olmadan uygulamayı tut</div></div>
+          </div>
+          <div class="pol-link" onclick="toast2('⏸️ Hesap 30 gün donduruldu','ok')">
+            <div class="pol-link-ic" style="background:rgba(251,146,60,.08)">⏸️</div>
+            <div><div class="pol-link-n">Hesabı dondur</div><div class="pol-link-s">30 gün ara ver, verilerin korunsun</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flbl" style="margin-top:14px">Onay — Şifreni gir</div>
+      <div class="fw"><span class="fi">🔒</span><input class="fld" id="del-pw" type="password" placeholder="Şifreni gir"></div>
+      <div class="flbl">Sebep (isteğe bağlı)</div>
+      <textarea class="ta" style="min-height:65px;margin-bottom:14px" placeholder="Ayrılma sebebini paylaşırsan geliştirmemize yardımcı olur..."></textarea>
+
+      <button style="width:100%;padding:13px;border-radius:12px;background:transparent;border:1.5px solid rgba(239,68,68,.4);color:#f87171;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:8px" onclick="doDeleteAccount()">🗑️ Hesabımı Kalıcı Olarak Sil</button>
+      <button class="bp" onclick="nav('settings')">Vazgeç, Hesabımı Koru</button>
+    </div>
+  </div>
+
+  <!-- NOTIFS -->
+  <div class="scr" id="notifs">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('feed')">←</div><div class="pt">Bildirimler</div></div>
+    <div class="sc">
+      <div class="nii"><div class="niiav" style="background:rgba(31,216,122,.1)">🥂</div><div class="niitx"><b>Burak Y.</b> bira ısmarladı! Kabul ediyor musun?<div style="display:flex;gap:6px;margin-top:7px"><button onclick="toast2('✅ Kabul edildi! ₺75 gelecek')" style="padding:5px 12px;background:linear-gradient(135deg,#6d28d9,#8b5cf6);border:none;border-radius:7px;font-size:11px;font-weight:700;color:#fff;cursor:pointer">Kabul Et</button><button onclick="toast2('❌ Reddedildi, iade edilecek')" style="padding:5px 12px;background:var(--s2);border:1px solid var(--bd2);border-radius:7px;font-size:11px;color:var(--mu2);cursor:pointer">Reddet</button></div><div class="niitm">2 dakika önce</div></div><div class="niid"></div></div>
+      <div class="nii"><div class="niiav" style="background:rgba(201,168,76,.1)">🎁</div><div class="niitx"><b>Zara</b> paylaşımın 38 beğeni aldı!<div class="niitm">4dk önce</div></div><div class="niid"></div></div>
+      <div class="nii"><div class="niiav" style="background:rgba(31,216,122,.1)">💳</div><div class="niitx"><b>₺200 bakiye yüklendi</b> • VISA •4242<div class="niitm">Dün</div></div><div class="niid"></div></div>
+      <div class="nii"><div class="niiav" style="background:rgba(61,142,255,.1)">📍</div><div class="niitx"><b>Shake Shack'ta</b> yeni paylaşım<div class="niitm">18dk önce</div></div></div>
+      <div class="nii"><div class="niiav" style="background:rgba(201,168,76,.1)">★</div><div class="niitx"><b>Top İçerik Üreticisi</b> rozetini kazandın!<div class="niitm">2 saat önce</div></div></div>
+    </div>
+  </div>
+
+  <!-- DETAIL -->
+  <div class="scr" id="detail">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('feed')">←</div><div class="pt">Zara • Cevahir AVM</div></div>
+    <div class="sc">
+      <div style="height:155px;border-radius:14px;background:linear-gradient(135deg,#1a0a24,#2d0f1a);display:flex;align-items:center;justify-content:center;font-size:56px;position:relative;overflow:hidden;margin-bottom:12px">🏬<div style="position:absolute;inset:0;background:radial-gradient(circle at 30% 50%,rgba(201,168,76,.1),transparent)"></div><div style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.6);border-radius:7px;padding:3px 8px;font-size:10px;font-weight:600">📍 1.kat</div><div style="position:absolute;bottom:8px;right:8px;background:rgba(31,216,122,.8);border-radius:7px;padding:3px 8px;font-size:10px;font-weight:700;color:#062015">● Açık</div></div>
+      <div style="display:flex;gap:6px;margin-bottom:12px">
+        <div style="flex:1;background:var(--s1);border:1px solid var(--bd);border-radius:11px;padding:10px;text-align:center"><div style="font-size:17px;font-weight:800;color:var(--pu)">127</div><div style="font-size:9px;color:var(--mu2)">Bu hafta</div></div>
+        <div style="flex:1;background:var(--s1);border:1px solid var(--bd);border-radius:11px;padding:10px;text-align:center"><div style="font-size:17px;font-weight:800;color:var(--gr)">4.7★</div><div style="font-size:9px;color:var(--mu2)">Puan</div></div>
+        <div style="flex:1;background:var(--s1);border:1px solid var(--bd);border-radius:11px;padding:10px;text-align:center"><div style="font-size:17px;font-weight:800;color:var(--bl)">2</div><div style="font-size:9px;color:var(--mu2)">Kampanya</div></div>
+      </div>
+      <div class="rws" style="margin:0 0 12px"><div class="rwi">🎁</div><div class="rwt"><div class="rwtt">Aktif: Yaz İndirimi</div><div class="rws2">50 beğeni = %10 indirim kodu</div></div></div>
+      <div class="sec">Son Paylaşımlar</div>
+      <div class="card"><div class="ct"><div class="av" style="background:linear-gradient(135deg,#ff4d26,#ff7a45)">M</div><div class="ai"><div class="an">Merve A.</div><div class="ap">4dk önce</div></div></div><div class="cb"><div class="ctxt">Yazlık elbiseler %40 indirimde! 🔥</div></div><div class="cf"><button class="act" onclick="doLike(this,38)"><span class="aic">🤍</span><span>38</span></button><button class="act"><span class="aic">💬</span><span>12</span></button></div></div>
+    </div>
+    <div style="padding:8px 16px 22px;border-top:1px solid var(--bd);flex-shrink:0"><button class="bp" onclick="nav('share')">Bu Mekânda Paylaşım Yap →</button></div>
+  </div>
+
+  <!-- BIZ -->
+  <div class="scr" id="biz">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('login')">←</div><div class="pt">İşletme Paneli</div><div style="font-size:9px;background:rgba(61,142,255,.1);color:var(--bl);padding:3px 7px;border-radius:7px;font-weight:600;flex-shrink:0">🏢 Zara</div></div>
+    <div class="sc">
+      <div style="font-size:17px;font-weight:700;margin-bottom:3px">Merhaba, Zara 👋</div>
+      <div style="color:var(--mu2);font-size:11px;margin-bottom:13px">Bugün 12 yeni paylaşım • ₺1.240 ödeme hacmi</div>
+      <div class="kpig">
+        <div class="kc"><div class="kv" style="color:var(--gold2)">127</div><div class="kl">Paylaşım</div><div class="kch">↑ %34</div></div>
+        <div class="kc"><div class="kv" style="color:var(--gr)">4.7</div><div class="kl">Puan</div><div class="kch">↑ 0.3</div></div>
+        <div class="kc"><div class="kv" style="color:var(--bl)">3.2K</div><div class="kl">Görüntüleme</div><div class="kch">↑ %18</div></div>
+        <div class="kc"><div class="kv" style="color:var(--gold)">₺1.240</div><div class="kl">Issmarla Hacmi</div><div class="kch">Bu hafta</div></div>
+      </div>
+      <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:13px;margin-bottom:14px">
+        <div style="display:flex;gap:7px;margin-bottom:13px"><button style="flex:1;padding:10px;border-radius:11px;background:linear-gradient(135deg,#6d28d9,#8b5cf6);border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer" onclick="nav('biz-reviews')">💬 Yorumları Yönet <span style='background:rgba(255,255,255,.2);border-radius:5px;padding:1px 5px'>19 yeni</span></button><button style="flex:1;padding:10px;border-radius:11px;background:var(--s2);border:1px solid var(--bd2);color:var(--mu2);font-size:11px;cursor:pointer" onclick="nav('group-coupon')">🎟️ Grup Kuponu</button></div><div style="font-size:11px;font-weight:600;margin-bottom:11px">📊 Günlük Paylaşım</div>
+        <div class="brow"><div class="brl">Pzt</div><div class="brt"><div class="brf" style="width:60%"></div></div><div style="font-size:9px;color:var(--mu2);width:18px">18</div></div>
+        <div class="brow"><div class="brl">Sal</div><div class="brt"><div class="brf" style="width:45%"></div></div><div style="font-size:9px;color:var(--mu2);width:18px">14</div></div>
+        <div class="brow"><div class="brl">Çar</div><div class="brt"><div class="brf" style="width:80%"></div></div><div style="font-size:9px;color:var(--mu2);width:18px">25</div></div>
+        <div class="brow"><div class="brl">Per</div><div class="brt"><div class="brf" style="width:70%"></div></div><div style="font-size:9px;color:var(--mu2);width:18px">22</div></div>
+        <div class="brow"><div class="brl">Cum</div><div class="brt"><div class="brf" style="width:90%"></div></div><div style="font-size:9px;color:var(--mu2);width:18px">28</div></div>
+        <div class="brow"><div class="brl">Cmt</div><div class="brt"><div class="brf" style="width:100%"></div></div><div style="font-size:9px;color:var(--mu2);width:18px">32</div></div>
+        <div class="brow"><div class="brl">Paz</div><div class="brt"><div class="brf" style="width:25%"></div></div><div style="font-size:9px;color:var(--mu2);width:18px">8</div></div>
+      </div>
+      <div class="sec">Kampanyalar</div>
+      <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:11px;margin-bottom:7px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><div style="font-size:12px;font-weight:600">🎁 Yaz İndirimi</div><div style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:6px;background:rgba(31,216,122,.1);color:var(--gr)">Aktif</div></div>
+        <div style="font-size:10px;color:var(--mu2);margin-bottom:8px">50 beğeni = %10 indirim • 30 Haziran</div>
+        <div style="display:flex;gap:12px"><div><div style="font-size:14px;font-weight:700;color:var(--gr)">8</div><div style="font-size:9px;color:var(--mu2)">Kazanan</div></div><div><div style="font-size:14px;font-weight:700;color:var(--bl)">38</div><div style="font-size:9px;color:var(--mu2)">En yüksek</div></div><div><div style="font-size:14px;font-weight:700;color:var(--pu)">₺1.2K</div><div style="font-size:9px;color:var(--mu2)">Issmarla</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GROUP COUPON DETAIL -->
+  <div class="scr" id="group-coupon">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('meet')">←</div><div class="pt">Grup Kuponu 🎟️</div></div>
+    <div class="sc" style="padding-bottom:28px">
+      <div style="background:linear-gradient(135deg,#1a0d35,#2d1555);border:1px solid rgba(139,92,246,.2);border-radius:16px;padding:18px;margin-bottom:14px;text-align:center;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:radial-gradient(circle,rgba(139,92,246,.2),transparent 70%)"></div>
+        <div style="font-size:44px;margin-bottom:10px">🍔</div>
+        <div style="font-size:18px;font-weight:800;color:var(--gold3);margin-bottom:4px">Shake Shack</div>
+        <div style="font-size:12px;color:var(--mu2);margin-bottom:12px">Cevahir AVM 3.kat • 140m uzakta</div>
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.3);border-radius:10px;padding:8px 16px">
+          <span style="font-size:22px;font-weight:900;color:var(--gold2)">%25</span>
+          <span style="font-size:12px;color:var(--mu2)">Grup İndirimi</span>
+        </div>
+      </div>
+
+      <div style="background:var(--s1);border:1px solid var(--bd);border-radius:14px;padding:13px;margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--mu2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Nasıl Çalışır?</div>
+        <div style="display:flex;gap:9px;margin-bottom:8px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:7px;background:rgba(139,92,246,.15);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--gold2);flex-shrink:0">1</div><div style="font-size:12px;color:var(--mu3);line-height:1.5">Gruba katıl, 4 kişi tamamlandığında herkese bildirim gider.</div></div>
+        <div style="display:flex;gap:9px;margin-bottom:8px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:7px;background:rgba(139,92,246,.15);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--gold2);flex-shrink:0">2</div><div style="font-size:12px;color:var(--mu3);line-height:1.5">Shake Shack'a birlikte gidin — kasaya grup kupon kodunu gösterin.</div></div>
+        <div style="display:flex;gap:9px;align-items:flex-start"><div style="width:22px;height:22px;border-radius:7px;background:rgba(139,92,246,.15);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--gold2);flex-shrink:0">3</div><div style="font-size:12px;color:var(--mu3);line-height:1.5">Herkes %25 indirimli öder. Ayrı hesap açılabilir!</div></div>
+      </div>
+
+      <div style="font-size:11px;font-weight:700;color:var(--mu2);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px">Gruptakiler (2/4)</div>
+      <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px">
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:10px;display:flex;align-items:center;gap:9px">
+          <div style="width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,#3a86ff,#023e8a);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0">B</div>
+          <div style="flex:1"><div style="font-size:12px;font-weight:500">Burak Y.</div><div style="font-size:10px;color:var(--mu2)">Grubu kuran • 140m</div></div>
+          <div style="font-size:10px;color:var(--gr);font-weight:600">● Orada</div>
+        </div>
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:10px;display:flex;align-items:center;gap:9px">
+          <div style="width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,#06d6a0,#028a5b);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0">M</div>
+          <div style="flex:1"><div style="font-size:12px;font-weight:500">Mert K.</div><div style="font-size:10px;color:var(--mu2)">Katıldı • 350m</div></div>
+          <div style="font-size:10px;color:var(--gr);font-weight:600">● Orada</div>
+        </div>
+        <div style="background:var(--s1);border:1px dashed rgba(139,92,246,.2);border-radius:12px;padding:10px;display:flex;align-items:center;gap:9px;opacity:.5">
+          <div style="width:36px;height:36px;border-radius:11px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">?</div>
+          <div style="flex:1"><div style="font-size:12px;color:var(--mu2)">Boş yer</div></div>
+        </div>
+        <div style="background:var(--s1);border:1px dashed rgba(139,92,246,.2);border-radius:12px;padding:10px;display:flex;align-items:center;gap:9px;opacity:.5">
+          <div style="width:36px;height:36px;border-radius:11px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">?</div>
+          <div style="flex:1"><div style="font-size:12px;color:var(--mu2)">Boş yer</div></div>
+        </div>
+      </div>
+
+      <div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.15);border-radius:12px;padding:11px;margin-bottom:14px;font-size:11px;color:var(--mu2);line-height:1.6">
+        ⏱ <b style="color:var(--gr)">2 saat 14 dakika</b> kaldı • Süre dolunca kupon iptal olur
+      </div>
+      <button class="bp" style="margin-bottom:8px" onclick="doJoinGroup('Shake Shack')">Gruba Katıl — %25 İndirim Kazan →</button>
+      <button style="width:100%;padding:11px;border-radius:11px;background:transparent;border:1px solid var(--bd2);color:var(--mu2);font-size:12px;cursor:pointer" onclick="toast2('🔗 Link kopyalandı!','gold')">Arkadaşına Paylaş 🔗</button>
+    </div>
+  </div>
+
+  <!-- BIZ REVIEW MANAGEMENT -->
+  <div class="scr" id="biz-reviews">
+    <div class="sb"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="ph"><div class="bk" onclick="nav('biz')">←</div><div class="pt">Yorumlar & Yönetim</div><div style="font-size:10px;background:rgba(16,185,129,.1);color:var(--gr);padding:3px 7px;border-radius:7px;font-weight:600;flex-shrink:0">4.7 ★</div></div>
+    <div class="sc" style="padding-bottom:28px">
+      
+      <!-- Stats row -->
+      <div style="display:flex;gap:7px;margin-bottom:14px">
+        <div style="flex:1;background:rgba(139,92,246,.06);border:1px solid rgba(139,92,246,.14);border-radius:12px;padding:11px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--gold2)">127</div><div style="font-size:9px;color:var(--mu2)">Toplam</div></div>
+        <div style="flex:1;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.14);border-radius:12px;padding:11px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--gr)">108</div><div style="font-size:9px;color:var(--mu2)">Olumlu</div></div>
+        <div style="flex:1;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.14);border-radius:12px;padding:11px;text-align:center"><div style="font-size:18px;font-weight:800;color:#f87171">19</div><div style="font-size:9px;color:var(--mu2)">Olumsuz</div></div>
+      </div>
+
+      <div style="display:flex;gap:6px;margin-bottom:12px">
+        <div style="flex:1;padding:7px;border-radius:9px;background:linear-gradient(135deg,#6d28d9,#8b5cf6);border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer;text-align:center" onclick="filterRevs('all',this)">Tümü</div>
+        <div style="flex:1;padding:7px;border-radius:9px;background:var(--s2);border:1px solid var(--bd);color:var(--mu2);font-size:11px;cursor:pointer;text-align:center" onclick="filterRevs('pos',this)">⭐ Olumlu</div>
+        <div style="flex:1;padding:7px;border-radius:9px;background:var(--s2);border:1px solid var(--bd);color:var(--mu2);font-size:11px;cursor:pointer;text-align:center" onclick="filterRevs('neg',this)">⚠️ Olumsuz</div>
+      </div>
+
+      <div class="sec">Bekleyen Aksiyonlar <span>3 yeni</span></div>
+
+      <!-- POSITIVE review -->
+      <div class="rev-card">
+        <div class="rev-head">
+          <div style="width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#ff4d6d,#c9184a);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0">M</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <span style="font-size:12px;font-weight:600">Merve A.</span>
+              <div class="rev-stars"><span class="rev-star">⭐</span><span class="rev-star">⭐</span><span class="rev-star">⭐</span><span class="rev-star">⭐</span><span class="rev-star">⭐</span></div>
+              <span class="pos-badge">5 ★ Mükemmel</span>
+            </div>
+            <div style="font-size:10px;color:var(--mu2);margin-top:2px">📍 Zara • 4dk önce • 38 beğeni</div>
+          </div>
+        </div>
+        <div class="rev-body">
+          <div class="rev-txt">"Yazlık koleksiyon çok şık! Personel yardımseverdi. Kesinlikle tavsiye ederim. Bu mağaza benim favorim oldu 🔥"</div>
+        </div>
+        <div class="rev-acts">
+          <button class="rev-btn rb-reward" onclick="showReward('Merve A.')">🎁 Ödüllendir</button>
+          <button class="rev-btn rb-reply" onclick="toggleReply(this)">💬 Yanıtla</button>
+        </div>
+        <div class="rev-reply-box">
+          <div style="font-size:10px;color:var(--mu2);margin-bottom:6px">Zara olarak yanıtla:</div>
+          <textarea style="width:100%;background:var(--s3);border:1px solid var(--bd2);border-radius:9px;padding:8px;color:var(--tx);font-size:11px;resize:none;outline:none;font-family:inherit;min-height:60px" placeholder="Değerli yorumun için teşekkürler Merve! Seni tekrar görmek isteriz..."></textarea>
+          <div style="display:flex;gap:6px;margin-top:6px">
+            <button style="flex:1;padding:7px;border-radius:8px;background:linear-gradient(135deg,#6d28d9,#8b5cf6);border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer" onclick="sendReply(this)">Gönder</button>
+            <button style="padding:7px 12px;border-radius:8px;background:var(--s3);border:none;color:var(--mu2);font-size:11px;cursor:pointer" onclick="this.closest('.rev-reply-box').classList.remove('on')">İptal</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEGATIVE review -->
+      <div class="rev-card" style="border-color:rgba(239,68,68,.15)">
+        <div class="rev-head">
+          <div style="width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#4361ee,#3a0ca3);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0">K</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <span style="font-size:12px;font-weight:600">Kerem B.</span>
+              <div class="rev-stars"><span class="rev-star">⭐</span><span class="rev-star">⭐</span></div>
+              <span class="neg-badge">⚠️ 2 ★</span>
+            </div>
+            <div style="font-size:10px;color:var(--mu2);margin-top:2px">📍 Zara • 2 saat önce</div>
+          </div>
+        </div>
+        <div class="rev-body">
+          <div class="rev-txt">"Kasada çok uzun beklettiler, soyunma odaları kalabalıktı. Personel ilgisizdi. Hayal kırıklığı yaşadım."</div>
+        </div>
+        <div class="rev-acts">
+          <button class="rev-btn rb-resolve" onclick="markResolved(this)">✅ Çözüldü</button>
+          <button class="rev-btn rb-reply" onclick="toggleReply(this)">💬 Yanıtla</button>
+        </div>
+        <div class="rev-reply-box">
+          <div style="font-size:10px;color:var(--mu2);margin-bottom:6px">Zara olarak yanıtla:</div>
+          <textarea style="width:100%;background:var(--s3);border:1px solid var(--bd2);border-radius:9px;padding:8px;color:var(--tx);font-size:11px;resize:none;outline:none;font-family:inherit;min-height:60px" placeholder="Kerem Bey, yaşadığınız deneyim için özür dileriz. Mağaza müdürümüzle iletişime geçtik..."></textarea>
+          <div style="display:flex;gap:6px;margin-top:6px">
+            <button style="flex:1;padding:7px;border-radius:8px;background:linear-gradient(135deg,#6d28d9,#8b5cf6);border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer" onclick="sendReply(this)">Gönder</button>
+            <button style="padding:7px 12px;border-radius:8px;background:var(--s3);border:none;color:var(--mu2);font-size:11px;cursor:pointer" onclick="this.closest('.rev-reply-box').classList.remove('on')">İptal</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- POSITIVE 2 -->
+      <div class="rev-card">
+        <div class="rev-head">
+          <div style="width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#9b5de5,#560bad);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;flex-shrink:0">Z</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              <span style="font-size:12px;font-weight:600">Zeynep A.</span>
+              <div class="rev-stars"><span class="rev-star">⭐</span><span class="rev-star">⭐</span><span class="rev-star">⭐</span><span class="rev-star">⭐</span></div>
+              <span class="pos-badge">4 ★ Güzel</span>
+            </div>
+            <div style="font-size:10px;color:var(--mu2);margin-top:2px">📍 Zara • 5 saat önce • 61 beğeni</div>
+          </div>
+        </div>
+        <div class="rev-body">
+          <div class="rev-txt">"Yeni koleksiyon müthiş. Fiyatlar biraz yüksek ama kalite iyi. Yine gelirim."</div>
+        </div>
+        <div class="rev-acts">
+          <button class="rev-btn rb-reward" onclick="showReward('Zeynep A.')">🎁 Ödüllendir</button>
+          <button class="rev-btn rb-reply" onclick="toggleReply(this)">💬 Yanıtla</button>
+        </div>
+        <div class="rev-reply-box">
+          <div style="font-size:10px;color:var(--mu2);margin-bottom:6px">Zara olarak yanıtla:</div>
+          <textarea style="width:100%;background:var(--s3);border:1px solid var(--bd2);border-radius:9px;padding:8px;color:var(--tx);font-size:11px;resize:none;outline:none;font-family:inherit;min-height:60px" placeholder="Zeynep Hanım, güzel yorumun için teşekkürler!..."></textarea>
+          <div style="display:flex;gap:6px;margin-top:6px">
+            <button style="flex:1;padding:7px;border-radius:8px;background:linear-gradient(135deg,#6d28d9,#8b5cf6);border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer" onclick="sendReply(this)">Gönder</button>
+            <button style="padding:7px 12px;border-radius:8px;background:var(--s3);border:none;color:var(--mu2);font-size:11px;cursor:pointer" onclick="this.closest('.rev-reply-box').classList.remove('on')">İptal</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec" style="margin-top:6px">Ödül Şablonları</div>
+      <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px">
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:11px;display:flex;align-items:center;gap:9px;cursor:pointer" onclick="toast2('✓ Şablon seçildi','gold')">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(139,92,246,.1);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">🏷️</div>
+          <div style="flex:1"><div style="font-size:12px;font-weight:500">%10 İndirim Kodu</div><div style="font-size:10px;color:var(--mu2);margin-top:1px">Sonraki alışveriş için</div></div>
+          <div style="font-size:10px;color:var(--gold2);font-weight:600">Seç</div>
+        </div>
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:11px;display:flex;align-items:center;gap:9px;cursor:pointer" onclick="toast2('✓ Şablon seçildi','gold')">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(16,185,129,.1);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">☕</div>
+          <div style="flex:1"><div style="font-size:12px;font-weight:500">Ücretsiz Aksesuar</div><div style="font-size:10px;color:var(--mu2);margin-top:1px">Kravat veya fular</div></div>
+          <div style="font-size:10px;color:var(--gold2);font-weight:600">Seç</div>
+        </div>
+        <div style="background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:11px;display:flex;align-items:center;gap:9px;cursor:pointer" onclick="toast2('✓ Özel ödül oluştur','gold')">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(139,92,246,.1);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">✨</div>
+          <div style="flex:1"><div style="font-size:12px;font-weight:500">Özel Ödül Oluştur</div><div style="font-size:10px;color:var(--mu2);margin-top:1px">Kendi ödülünü belirle</div></div>
+          <div style="font-size:10px;color:var(--gold2);font-weight:600">Yeni</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- REWARD MODAL -->
+  <div class="modal" id="RM" onclick="if(event.target===this)document.getElementById('RM').classList.remove('on')">
+    <div class="msh">
+      <div class="mh"></div>
+      <div class="mt">🎁 Ödüllendir</div>
+      <div style="font-size:13px;color:var(--mu2);margin-bottom:13px" id="rm-person">Merve A. için ödül seç</div>
+      <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:14px">
+        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:11px;padding:11px;display:flex;align-items:center;gap:9px;cursor:pointer" onclick="giveReward('10')">
+          <div style="font-size:19px;flex-shrink:0">🏷️</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">%10 İndirim Kodu</div><div style="font-size:10px;color:var(--mu2)">Sonraki alışverişte geçerli</div></div>
+        </div>
+        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:11px;padding:11px;display:flex;align-items:center;gap:9px;cursor:pointer" onclick="giveReward('20')">
+          <div style="font-size:19px;flex-shrink:0">💎</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">%20 VIP İndirim</div><div style="font-size:10px;color:var(--mu2)">Özel müşteri ödülü</div></div>
+        </div>
+        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:11px;padding:11px;display:flex;align-items:center;gap:9px;cursor:pointer" onclick="giveReward('kargo')">
+          <div style="font-size:19px;flex-shrink:0">🎀</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:500">Ücretsiz Aksesuar</div><div style="font-size:10px;color:var(--mu2)">Kravat veya fular hediye</div></div>
+        </div>
+      </div>
+      <button class="bp" onclick="document.getElementById('RM').classList.remove('on');toast2('✓ Ödül gönderildi!','ok')">Ödülü Gönder →</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+var cur="splash",obI=0,selPl=null,sT="",sP=0,sE="",loadAmt=200,tt;
+setTimeout(function(){nav("ob");},2400);
+
+function nav(id){
+  if(cur===id)return;
+  var p=document.getElementById(cur),n=document.getElementById(id);
+  if(!p||!n)return;
+  p.classList.add("eo");p.classList.remove("active");
+  setTimeout(function(){p.classList.remove("eo");},220);
+  n.classList.add("active","ei");
+  setTimeout(function(){n.classList.remove("ei");},300);
+  cur=id;
+}
+function obNext(){
+  var sls=document.querySelectorAll(".obsl"),ds=document.querySelectorAll(".odd");
+  sls[obI].classList.remove("on");sls[obI].classList.add("prev");
+  var pi=obI;setTimeout(function(){sls[pi].classList.remove("prev");},420);
+  if(obI<sls.length-1){obI++;sls[obI].classList.add("on");ds.forEach(function(d,i){d.classList.toggle("on",i===obI);});if(obI===sls.length-1)document.getElementById("obn").textContent="Başla →";}
+  else nav("login");
+}
+function selType(el){document.querySelectorAll(".ut").forEach(function(u){u.classList.remove("on");});el.classList.add("on");}
+function doLogin(){toast2("Giriş yapılıyor...","gold");setTimeout(function(){nav("feed");},800);}
+function doReg(){toast2("Hesap oluşturuldu!","ok");setTimeout(function(){nav("feed");},800);}
+function closePM(){document.getElementById("PM").classList.remove("on");}
+function pickP(n,l,ic,camp){
+  selPl={n:n,l:l,ic:ic};
+  var t=document.getElementById("plt");t.textContent=ic+" "+n+" • "+l;t.style.color="var(--tx)";
+  document.getElementById("PM").classList.remove("on");
+  var ch=document.getElementById("ch");
+  if(camp==="zara"){document.getElementById("chn").textContent="Zara Kampanyası!";document.getElementById("chd").textContent="50 beğeni = %10 indirim";ch.style.display="flex";}
+  else if(camp==="shake"){document.getElementById("chn").textContent="Shake Shack!";document.getElementById("chd").textContent="50 beğeni = Bedava patates";ch.style.display="flex";}
+  else if(camp==="hm"){document.getElementById("chn").textContent="H&M Kampanyası!";document.getElementById("chd").textContent="100 beğeni = %15 indirim";ch.style.display="flex";}
+  else ch.style.display="none";
+  toast2("📍 "+n+" seçildi","gold");
+}
+function upCC(el){var l=el.value.length;document.getElementById("cc").textContent=l+" / 500";}
+function setStar(n){document.querySelectorAll(".star").forEach(function(s,i){s.classList.toggle("on",i<n);});}
+function doShare(){
+  if(!selPl){toast2("Mekân seç!","err");return;}
+  if(!document.getElementById("sha").value.trim()){toast2("Bir şeyler yaz!","err");return;}
+  toast2("Paylaşıldı! 🚀","ok");
+  setTimeout(function(){
+    document.getElementById("sha").value="";document.getElementById("cc").textContent="0 / 500";
+    document.getElementById("plt").textContent="Mekân seç...";document.getElementById("plt").style.color="var(--mu)";
+    document.getElementById("ch").style.display="none";selPl=null;
+    document.querySelectorAll(".star").forEach(function(s){s.classList.remove("on");});
+    document.querySelectorAll(".mo").forEach(function(m){m.classList.remove("on");});
+    nav("feed");
+  },900);
+}
+function openSend(person,emoji,place,price){
+  sT=emoji+" "+person.split(" ")[0];sP=price;sE=emoji;
+  document.getElementById("sttl").textContent="Issmarla 🥂";
+  document.getElementById("sem").textContent=emoji;
+  document.getElementById("spr").textContent=person+"'ye";
+  document.getElementById("spl").textContent=place+"'ta";
+  document.getElementById("sprice").textContent="₺"+price;
+  document.getElementById("pay-amt-s").textContent="₺"+price+",00";
+  document.getElementById("after-bal").textContent="₺"+(247.5-price).toFixed(2).replace(".",",");
+  document.querySelectorAll(".ti").forEach(function(t){t.classList.remove("on");});
+  document.querySelector(".ti").classList.add("on");
+  nav("meet-send");
+}
+function selT(el,name,price,emoji){
+  document.querySelectorAll("#treat-grid .ti").forEach(function(t){t.classList.remove("on");});
+  el.classList.add("on");sT=name;sP=price;sE=emoji;
+  document.getElementById("sprice").textContent="₺"+price;
+  document.getElementById("pay-amt-s").textContent="₺"+price+",00";
+  document.getElementById("after-bal").textContent="₺"+(247.5-price).toFixed(2).replace(".",",");
+  document.getElementById("sem").textContent=emoji;
+}
+function doSend(){
+  toast2("İşleniyor...","gold");
+  document.getElementById("sbtn").innerHTML='<span class="spin"></span>Ödeme yapılıyor...';
+  document.getElementById("sbtn").style.opacity=".7";
+  setTimeout(function(){
+    document.getElementById("sbtn").innerHTML="Ödemeyi Onayla & Issmarla →";
+    document.getElementById("sbtn").style.opacity="1";
+    document.getElementById("success-msg").textContent=sT.split("'")[0]+" onaylarsa "+sE+" hazırlanacak!";
+    document.getElementById("succ-amt").textContent="₺"+sP+",00";
+    document.getElementById("succ-bal").textContent="₺"+(247.5-sP).toFixed(2).replace(".",",");
+    nav("pay-success");
+  },1800);
+}
+function selCard(el){document.querySelectorAll(".card-m").forEach(function(c){c.classList.remove("sel");c.querySelector(".cm-chk").classList.remove("on");c.querySelector(".cm-chk").textContent="";});el.classList.add("sel");var ck=el.querySelector(".cm-chk");ck.classList.add("on");ck.textContent="✓";}
+function selAmt(el,amt){document.querySelectorAll("#amts .ti").forEach(function(t){t.classList.remove("on");});el.classList.add("on");loadAmt=amt;if(amt>0){document.getElementById("pamt").textContent="₺"+amt+",00";document.getElementById("load-btn").textContent="₺"+amt+" Yükle →";};}
+function doLoad(){toast2("₺"+loadAmt+" yükleniyor...","gold");var lb=document.getElementById("load-btn");lb.innerHTML='<span class="spin"></span>İşleniyor...';lb.style.opacity=".7";setTimeout(function(){lb.innerHTML="₺"+loadAmt+" Yükle →";lb.style.opacity="1";toast2("✓ ₺"+loadAmt+" yüklendi!","ok");setTimeout(function(){nav("wallet");},800);},2000);}
+function doAddCard(){var cn=document.getElementById("cnum").value.replace(/\s/g,"");if(cn.length<14){toast2("Geçerli kart numarası gir","err");return;}toast2("Kart kaydediliyor...","gold");setTimeout(function(){toast2("✓ Kart eklendi!","ok");setTimeout(function(){nav("wallet");},800);},1800);}
+function fmtCard(el){var v=el.value.replace(/\D/g,"").substring(0,16);el.value=v.replace(/(\d{4})/g,"$1 ").trim();var prev=document.getElementById("card-preview");prev.textContent=v.padEnd(16,"•").replace(/(\d{4}|\D{4})/g,"$1 ").trim();}
+function fmtExp(el){var v=el.value.replace(/\D/g,"");if(v.length>=2)v=v.substring(0,2)+"/"+v.substring(2,4);el.value=v;document.getElementById("exp-preview").textContent=v||"MM/YY";}
+function doLike(btn,n){if(btn.classList.contains("liked"))return;btn.classList.add("liked");btn.querySelector(".aic").textContent="❤️";btn.querySelectorAll("span")[1].textContent=parseInt(n)+1;toast2("❤️ Beğenildi","ok");}
+function swT(el){document.querySelectorAll(".tab").forEach(function(t){t.classList.remove("on");});el.classList.add("on");}
+function toast2(msg,type){
+  var t=document.getElementById("T");t.textContent=msg;
+  t.className="toast"+(type?" "+type:"");
+  t.classList.add("on");clearTimeout(tt);
+  tt=setTimeout(function(){t.classList.remove("on");},2600);
+}
+
+function doJoinGroup(name){toast2('🎉 '+name+' grubuna katıldın!','ok');setTimeout(function(){nav('meet');},1200);}
+function toggleReply(btn){var box=btn.closest('.rev-card').querySelector('.rev-reply-box');box.classList.toggle('on');}
+function sendReply(btn){var box=btn.closest('.rev-reply-box');box.innerHTML='<div style="font-size:12px;color:var(--gr);font-weight:600;padding:4px 0">✓ Yanıtın yayınlandı</div>';toast2('💬 Yanıt gönderildi!','ok');}
+function markResolved(btn){btn.textContent='✅ Çözüldü';btn.style.opacity='.5';btn.style.pointerEvents='none';toast2('✅ Şikayet çözüldü olarak işaretlendi','ok');}
+function showReward(name){document.getElementById('rm-person').textContent=name+' için ödül seç';document.getElementById('RM').classList.add('on');}
+function giveReward(type){document.getElementById('RM').classList.remove('on');toast2('🎁 Ödül gönderildi!','ok');}
+function filterRevs(type,el){document.querySelectorAll('.sc div[style*="flex:1;padding:7px"]').forEach(function(b){b.style.background='var(--s2)';b.style.color='var(--mu2)';b.style.border='1px solid var(--bd)';});if(el){el.style.background='linear-gradient(135deg,#6d28d9,#8b5cf6)';el.style.color='#fff';el.style.border='none';}}
+
+function openReport(type, target){
+  document.getElementById('rep-target').innerHTML='Raporlanan: <b style="color:var(--tx)">'+target+'</b>';
+  document.getElementById('rep-back').setAttribute('onclick',"nav('feed')");
+  nav('report-content');
+}
+function selRep(el){
+  el.closest('.sc, .msh').querySelectorAll('.rep-opt').forEach(function(o){
+    o.classList.remove('on');
+    o.querySelector('.rep-chk').classList.remove('on');
+    o.querySelector('.rep-chk').textContent='';
+  });
+  el.classList.add('on');
+  var chk=el.querySelector('.rep-chk');
+  chk.classList.add('on');chk.textContent='✓';
+}
+function selComp(el){
+  el.closest('.sc').querySelectorAll('.rep-opt').forEach(function(o){
+    o.classList.remove('on');
+    o.querySelector('.rep-chk').classList.remove('on');
+    o.querySelector('.rep-chk').textContent='';
+  });
+  el.classList.add('on');
+  var chk=el.querySelector('.rep-chk');
+  chk.classList.add('on');chk.textContent='✓';
+}
+function doReport(){toast2('✓ Rapor gön
